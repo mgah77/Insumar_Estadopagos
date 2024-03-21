@@ -1,0 +1,5 @@
+<odoo>
+    <record id="group_addon_estadopago" model="res.groups">
+	     <field name="name">ADM estado pago clientes</field>
+    </record>
+</odoo>
