@@ -3,6 +3,5 @@
         name="Estados de Pago"
         res_model="wizard.estadopago"
         view_mode = "form"
-        type_mode = "form"
-        target = "new" />
+        type_mode = "form" />
 </odoo>
