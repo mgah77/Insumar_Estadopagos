@@ -1,6 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 <data>
+
+<act_window
+id="action_estadopagos"
+name="Estados de Pago"
+res_model="wizard.estadopago"
+view_mode = "form"
+view_type = "form"
+target = "new " />
+
+<menuitem
+id="estadopagos_menu"
+parent=""
+action="action_estadopagos" />
+
+
+
 </data>
 
 
