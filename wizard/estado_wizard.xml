@@ -10,8 +10,8 @@
             </form>
             </field>
         </record>
-        <record id="action.estadopago" model="ir.actions.act_window">
-            <field name="name">Estados de pago</field>
+        <record id="action_estadopago" model="ir.actions.act_window">
+            <field name="name">action.estadopago</field>
             <field name="res_model">wizard.estadopago</field>
             <field name="type">ir.actions.act_window</field>
             <field name="view_mode">form</field>
