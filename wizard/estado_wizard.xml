@@ -1,7 +1,13 @@
 <odoo>
-    
+    <record id="estadopago.form" model="ir.ui.view">
+           <field name="name">estado.pago.wizard.form</field>
+           <field name="res_model">wizard.estadopago</field>
+           <field name="arch" type="xml">
+           </field>
+    </record>
 
     <act_window id="action_estadopagos"
+    name = "Estados de Pago"
     res_model = "wizard.estadopago"
     view_mode = "form"
     target = "new"
