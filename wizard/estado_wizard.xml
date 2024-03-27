@@ -4,7 +4,7 @@
         <record id="estado_wizard_form" model="ir.ui.view">
         <field name="name">estado.wizard.form</field>
         <field name="model">wizard.estadopago</field>
-        <field name="arch>" type="xml">
+        <field name="arch" type="xml">
         <form>
         <field name="cliente" />
         </form>
