@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+<data>
     <record id="estadopago.form" model="ir.ui.view">
            <field name="name">estado.pago.wizard.form</field>
            <field name="res_model">wizard.estadopago</field>
@@ -18,5 +19,5 @@
     parent=""
     groups="Insumar_Estadopagos.group_addon_estadopago"
     action="action_estadopagos" />
-
+</data>
 </odoo>
