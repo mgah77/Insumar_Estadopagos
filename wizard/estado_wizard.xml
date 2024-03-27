@@ -17,7 +17,6 @@
 
     <menuitem id="estado_pago_menu"
     parent=""
-    groups="Insumar_Estadopagos.group_addon_estadopago"
     action="action_estadopagos" />
 </data>
 </odoo>
