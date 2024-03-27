@@ -6,6 +6,7 @@
         <field name="model">wizard.estadopago</field>
         <field name="arch>" type="xml">
         <form>
+        <field name="cliente" />
         </form>
         </field>
         </record>
