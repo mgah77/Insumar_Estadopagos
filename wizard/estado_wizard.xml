@@ -6,12 +6,18 @@
             <field name="model">wizard.estadopago</field>
             <field name="arch" type="xml">
             <form>
-            <field name="cliente" />
+                <group>
+                <field name="cliente" />
+                </group>
+                <br/><br/>
+                <h4>Facturas vencidas</h4>
+                <label for = "fac_vencida" string="Cantidad " />
+                <field name = "fac_vencida" />
             </form>
             </field>
         </record>
         <record id="action_estadopago" model="ir.actions.act_window">
-            <field name="name">action.estadopago</field>
+            <field name="name">Estados de Pago</field>
             <field name="res_model">wizard.estadopago</field>
             <field name="type">ir.actions.act_window</field>
             <field name="view_mode">form</field>
