@@ -9,8 +9,7 @@
 'version': "2.0",
 'data': ['security/groups.xml',
          'security/ir.model.access.csv',
-         'wizard/estado_wizard.xml',
-         'views/menus.xml'
+         'wizard/estado_wizard.xml'
 ],
 'depends': ['base' , 'contacts' , 'account']
 }
