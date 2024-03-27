@@ -1,13 +1,15 @@
 <odoo>
-    <menuitem id="estado_pago_menu"
-    parent=""
-    groups="Insumar_estadopagos.group_addon_estadopago"
-    action="action_estadopagos" />
+    
 
     <act_window id="action_estadopagos"
     res_model = "wizard.estadopago"
     view_mode = "form"
     target = "new"
     view_type = "form" />
+
+    <menuitem id="estado_pago_menu"
+    parent=""
+    groups="Insumar_estadopagos.group_addon_estadopago"
+    action="action_estadopagos" />
 
 </odoo>
