@@ -17,5 +17,8 @@
             <field name="view_mode">form</field>
             <field name="target">new</field>
         </record>
+        <menuitem id="estados_menu"
+            parent=""
+            action="action_estadopago" />
     </data>
 </odoo>
