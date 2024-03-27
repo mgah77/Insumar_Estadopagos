@@ -2,13 +2,20 @@
 <odoo>
     <data>
         <record id="estado_wizard_form" model="ir.ui.view">
-        <field name="name">estado.wizard.form</field>
-        <field name="model">wizard.estadopago</field>
-        <field name="arch" type="xml">
-        <form>
-        <field name="cliente" />
-        </form>
-        </field>
+            <field name="name">estado.wizard.form</field>
+            <field name="model">wizard.estadopago</field>
+            <field name="arch" type="xml">
+            <form>
+            <field name="cliente" />
+            </form>
+            </field>
+        </record>
+        <record id="action.estadopago" model="ir.actions.act_window">
+            <field name="name">Estados de pago</field>
+            <field name="res_model">wizard.estadopago</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
         </record>
     </data>
 </odoo>
