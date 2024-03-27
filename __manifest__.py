@@ -8,7 +8,8 @@
 'application': "True",
 'version': "2.0",
 'data': ['security/groups.xml',
-         'security/ir.model.access.csv'
+         'security/ir.model.access.csv',
+         'wizard/estado_wizard.xml'
 ],
 'depends': ['base' , 'contacts' , 'account']
 }
