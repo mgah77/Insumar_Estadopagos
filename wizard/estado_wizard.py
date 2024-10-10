@@ -6,4 +6,40 @@ class EstadoWizard(models.TransientModel):
     _description = "Estado de pago de clientes"
 
     cliente = fields.Many2one('res.partner', string='Cliente',domain=[('is_company','=',True)])
-    fac_vencida = fields.Integer(string = 'Facturas Vencidas')
+    fac_vencido = fields.Integer(string="FacturasVencidas", compute='_compute_cantidad_vencida')
+    vencido = fields.Float(string="Cantidad Vencida", compute='_compute_cantidad_vencida', digits=(16, 0))
+    pre_fac_vencido = fields.Integer(string="Facturas por vencer", compute='_compute_cantidad_vencida')
+    pre_vencido = fields.Float(string="Cantidad por vencer", compute='_compute_cantidad_vencida', digits=(16, 0))
+    totales = fields.Float(string="Total Deuda", compute='_compute_cantidad_vencida', digits=(16, 0))
+    facturas_out = fields.One2many('account.move', compute='_compute_cantidad_vencida', string="Facturas")
+    facturas_in = fields.One2many('account.move', compute='_compute_cantidad_vencida', string="Facturas")
+
+    
+    @api.depends('cliente')
+    def _compute_cantidad_vencida(self):
+        Invoice = self.env['account.move']
+        for record in self:
+            if record.cliente:
+                fac_vencido = Invoice.search_count([('partner_id', '=', record.cliente.id),('move_type', '=', 'out_invoice'),('payment_state', '=', 'not_paid'),('date_due', '<', fields.Date.today())])
+                record.fac_vencido = fac_vencido
+                vencido = Invoice.search([('partner_id', '=', record.cliente.id),('move_type', '=', 'out_invoice'),('payment_state', '=', 'not_paid'),('date_due', '<', fields.Date.today())])
+                total_vencido = sum(factura.residual_signed for factura in vencido)
+                record.vencido = total_vencido
+                pre_fac_vencido = Invoice.search_count([('partner_id', '=', record.cliente.id),('move_type', '=', 'out_invoice'),('payment_state', '=', 'not_paid'),('date_due', '>=', fields.Date.today())])
+                record.pre_fac_vencido = pre_fac_vencido
+                pre_vencido = Invoice.search([('partner_id', '=', record.cliente.id),('move_type', '=', 'out_invoice'),('payment_state', '=', 'not_paid'),('date_due', '>=', fields.Date.today())])
+                total_pre_vencido = sum(factura.residual_signed for factura in pre_vencido)
+                record.pre_vencido = total_pre_vencido
+                pre_total = Invoice.search([('partner_id', '=', record.cliente.id),('move_type', '=', 'out_invoice'),('payment_state', '=', 'not_paid')])
+                totales = sum(factura.residual_signed for factura in pre_total)
+                record.totales = totales
+                record.facturas_out = Invoice.search([('partner_id', '=', record.cliente.id), ('move_type', '=', 'out_invoice'), ('payment_state', '=', 'not_paid'),('date_due', '<', fields.Date.today())])
+                record.facturas_in = Invoice.search([('partner_id', '=', record.cliente.id), ('move_type', '=', 'out_invoice'), ('payment_state', '=', 'not_paid'),('date_due', '>=', fields.Date.today())])
+            else:
+                record.fac_vencido = 0
+                record.vencido = 0
+                record.pre_fac_vencido = 0
+                record.pre_vencido = 0
+                record.totales = 0
+        return
+

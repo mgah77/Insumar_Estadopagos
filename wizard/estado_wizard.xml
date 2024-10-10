@@ -11,8 +11,8 @@
                 </group>
                 <br/><br/>
                 <h4>Facturas vencidas</h4>
-                <label for = "fac_vencida" string="Cantidad " />
-                <field name = "fac_vencida" />
+                <label for = "fac_vencido" string="Cantidad " />
+                <field name = "fac_vencido" />
             </form>
             </field>
         </record>
