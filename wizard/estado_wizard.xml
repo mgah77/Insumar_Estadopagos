@@ -10,9 +10,22 @@
                 <field name="cliente" />
                 </group>
                 <br/><br/>
-                <h4>Facturas vencidas</h4>
-                <label for = "fac_vencido" string="Cantidad " />
-                <field name = "fac_vencido" />
+                        <h4>Facturas vencidas</h4>
+                        <label for="fac_vencido" string="Cantidad "/>
+                        <field name="fac_vencido"/>
+                        <label for="vencido" string=", Valor adeudado $ "/>
+                        <field name="vencido"/>
+                        <h4> </h4>
+                        <h4>Facturas por vencer</h4>
+                        <label for="pre_fac_vencido" string="Cantidad "/>
+                        <field name="pre_fac_vencido"/>
+                        <label for="pre_vencido" string=", Valor adeudado $ "/>
+                        <field name="pre_vencido"/>
+                        <br /><br />
+                        <h4>
+                        <label for="totales" string="Total adeudado $ "/>
+                        <field name="totales"/>
+                        </h4>
             </form>
             </field>
         </record>
