@@ -1,0 +1,88 @@
+<odoo>
+    <report
+        id="action_payment_report"
+        model="wizard.estadopago"
+        string="Reporte de Caja"
+        report_type="qweb-pdf"
+        name="Insumar_Estadopagos.report_estado_pago"
+        file="Insumar_Estadopagos.report_estado_pago"
+        menu="False"
+    />
+    <data>
+        <template id="report_estado_pago">
+            <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <!-- Contenido del informe -->
+                    <div class="page">
+                        <br /><br />
+                        <center><h1><ins>Informe de Estado de pagos</ins></h1></center>    
+                                         
+                        <table width="100%">
+                        <thead>
+                            <tr>
+                                <center>
+                                <td width="100%" style="text-align: left;" colspan="3"><h3>Cliente: <span t-esc="doc.cliente.name"/></h3></td>                                
+                                </center>
+                            </tr>                            
+                        </thead>
+                        <br/><br/>
+                        <tbody>
+                            <t t-if="len(doc.facturas_in) == 0">
+                                <tr>
+                                    <td>No hay facturas por vencer</td>
+                                </tr>
+                                <tr><td colspan="3"><hr/></td></tr>
+                            </t>                            
+                            <t t-else="">
+                                <tr>
+                                    <td>Facturas por vencer: <span t-esc="doc.pre_fac_vencido"/></td>                                
+                                </tr>                                
+                                <tr><td colspan="3"><br/></td></tr>
+                                <tr>
+                                    <td>Número de Factura</td><td>Fecha de Vencimiento</td><td>Monto</td>
+                                </tr>                       
+                                <t t-foreach="doc.facturas_in" t-as="factura">
+                                    <tr>
+                                        <td>Nº: <span t-esc="factura.sii_document_number"/></td>
+                                        <td><span t-esc="factura.date_due.strftime('%d-%b-%Y')"/></td>
+                                        <td>$ <span t-esc="'{:.0f}'.format(factura.amount_residual_signed)"/></td>
+
+                                        <!-- Agrega más campos de la factura aquí -->
+                                    </tr>
+                                    <tr><td colspan="3"><hr/></td></tr>
+                                </t> 
+                            </t>
+                            <t t-if="len(doc.facturas_out) == 0">
+                                <tr>
+                                    <td>No hay facturas vencidas</td>
+                                </tr>
+                            </t>
+                            <t t-else="">
+                                <tr>
+                                    <td>Facturas vencidas: <span t-esc="doc.fac_vencido"/></td>                                
+                                </tr> 
+                                <tr><td colspan="3"><br/></td></tr>
+                                <tr>
+                                    <td>Número de Factura</td><td>Fecha de Vencimiento</td><td>Monto</td>
+                                </tr>               
+                                <t t-foreach="doc.facturas_out" t-as="factura">
+                                    <tr>
+                                        <td>Nº: <span t-esc="factura.sii_document_number"/></td>
+                                        <td> <span t-esc="factura.date_due.strftime('%d-%b-%Y')"/></td>
+                                        <td>$ <span t-esc="'{:.0f}'.format(factura.amount_residual_signed)"/></td>
+                                        <!-- Agrega más campos de la factura aquí -->
+                                    </tr>
+                                </t>  
+                            </t> 
+                            <tr><td colspan="3"><hr/></td></tr>
+                            <tr><td></td><td><h3>Total Deuda</h3></td><td><h3>$<span t-esc="'{:.0f}'.format(doc.totales)"/></h3></td></tr>                         
+                        </tbody>
+                        </table>
+                    </div>
+                </t>
+            </t>
+            </t>
+        </template>
+    </data>
+</odoo>

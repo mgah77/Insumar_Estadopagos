@@ -26,7 +26,12 @@
                         <label for="totales" string="Total adeudado $ "/>
                         <field name="totales"/>
                         </h4>
+                <footer>
+                    <button string="Imprimir" name="action_print_report" type="object" default_focus="1" class="btn-primary"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
             </form>
+            
             </field>
         </record>
         <record id="action_estadopago" model="ir.actions.act_window">
