@@ -45,7 +45,7 @@
                                 <t t-foreach="doc.facturas_in" t-as="factura">
                                     <tr>
                                         <td>Nº: <span t-esc="factura.sii_document_number"/></td>
-                                        <td><span t-esc="factura.date_due.strftime('%d-%b-%Y')"/></td>
+                                        <td><span t-esc="factura.invoice_date_due.strftime('%d-%b-%Y')"/></td>
                                         <td>$ <span t-esc="'{:.0f}'.format(factura.amount_residual_signed)"/></td>
 
                                         <!-- Agrega más campos de la factura aquí -->
@@ -69,7 +69,7 @@
                                 <t t-foreach="doc.facturas_out" t-as="factura">
                                     <tr>
                                         <td>Nº: <span t-esc="factura.sii_document_number"/></td>
-                                        <td> <span t-esc="factura.date_due.strftime('%d-%b-%Y')"/></td>
+                                        <td> <span t-esc="factura.invoice_date_due.strftime('%d-%b-%Y')"/></td>
                                         <td>$ <span t-esc="'{:.0f}'.format(factura.amount_residual_signed)"/></td>
                                         <!-- Agrega más campos de la factura aquí -->
                                     </tr>
