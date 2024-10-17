@@ -5,7 +5,7 @@ class EstadoWizard(models.TransientModel):
     _name = "wizard.estadopago"
     _description = "Estado de pago de clientes"
 
-    cliente = fields.Many2one('res.partner', string='Cliente',domain=[('is_company','=',True)])
+    cliente = fields.Many2one('res.partner',string='Cliente',domain="[('type', '!=', 'private'), ('is_company', '=', True), ('type','=','contact'), ('is_customer','=',True)]")
     fac_vencido = fields.Integer(string="FacturasVencidas", compute='_compute_cantidad_vencida')
     vencido = fields.Float(string="Cantidad Vencida", compute='_compute_cantidad_vencida', digits=(16, 0))
     pre_fac_vencido = fields.Integer(string="Facturas por vencer", compute='_compute_cantidad_vencida')
