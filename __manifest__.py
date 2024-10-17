@@ -12,5 +12,5 @@
          'report/report_payment.xml',
          'wizard/estado_wizard.xml'
 ],
-'depends': ['base' , 'contacts' , 'account']
+'depends': ['base' , 'contacts' , 'account', 'parches_insumar']
 }
