@@ -54,5 +54,17 @@
                 </form>
             </field>
         </record>
+
+        <record id="action_estadopago" model="ir.actions.act_window">
+            <field name="name">Estados de Pago</field>
+            <field name="res_model">wizard.estadopago</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_mode">form</field>
+            <field name="target">new</field>
+        </record>
+        <menuitem id="estados_menu"
+            parent=""
+            action="action_estadopago" />
+
     </data>
 </odoo>
