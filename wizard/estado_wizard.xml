@@ -17,7 +17,7 @@
                             <tree editable="false">
                                 <!--field name="sii_document_number" string="Número de Factura" /!-->
                                 <field name="invoice_date_due" string="Fecha de Vencimiento"/>
-                                <!--field name="amount_residual_signed" string="Monto"/!-->
+                                <field name="amount_residual_signed" string="Monto"/>
                             </tree>
                             </field>
                         <label for="vencido" string=", Valor adeudado $ "/>
