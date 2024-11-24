@@ -41,8 +41,8 @@ class EstadoWizard(models.TransientModel):
                 record.pre_fac_vencido = 0
                 record.pre_vencido = 0
                 record.totales = 0
-                record.facturas_out = ''
-                record.facturas_in = ''
+                record.facturas_out = [(5, 0, 0)]  # Limpiar las relaciones
+                record.facturas_in = [(5, 0, 0)]
         return
 
     def action_print_report(self):
