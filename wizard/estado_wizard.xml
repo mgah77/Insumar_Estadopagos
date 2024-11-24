@@ -5,51 +5,54 @@
             <field name="name">estado.wizard.form</field>
             <field name="model">wizard.estadopago</field>
             <field name="arch" type="xml">
-    <form>
-        <group>
-            <field name="cliente" />
-        </group>
-        <group>
-            <h4>Facturas vencidas</h4>
-            <field name="fac_vencido"/>
-            <field name="vencido"/>
-            <field name="facturas_out" widget="one2many_list">
-                <tree string="Facturas Vencidas">
-                    <field name="sii_document_number" string="Número de Factura"/>
-                    <field name="invoice_date_due" string="Fecha de Vencimiento"/>
-                    <field name="amount_residual_signed" string="Monto" digits="0"/>
-                </tree>
-            </field>
-        </group>
-        <group>
-            <h4>Facturas por vencer</h4>
-            <field name="pre_fac_vencido"/>
-            <field name="pre_vencido"/>
-            <field name="facturas_in" widget="one2many_list">
-                <tree string="Facturas por Vencer">
-                    <field name="sii_document_number" string="Número de Factura"/>
-                    <field name="invoice_date_due" string="Fecha de Vencimiento"/>
-                    <field name="amount_residual_signed" string="Monto" digits="0"/>
-                </tree>
-            </field>
-        </group>
-        <footer>
-            <button string="Imprimir" name="action_print_report" type="object" class="btn-primary"/>
-            <button string="Cancelar" class="btn-secondary" special="cancel"/>
-        </footer>
-    </form>
-            
+                <form>
+                    <group>
+                        <field name="cliente" />
+                    </group>
+                    <br/><br/>
+                    <h4>Facturas vencidas</h4>
+                    <label for="fac_vencido" string="Cantidad "/>
+                    <field name="fac_vencido"/>
+                    <label for="vencido" string=", Valor adeudado $ "/>
+                    <field name="vencido"/>
+                    <h4> </h4>
+                    <h4>Facturas por vencer</h4>
+                    <label for="pre_fac_vencido" string="Cantidad "/>
+                    <field name="pre_fac_vencido"/>
+                    <label for="pre_vencido" string=", Valor adeudado $ "/>
+                    <field name="pre_vencido"/>
+                    <br /><br />
+                    <h4>
+                        <label for="totales" string="Total adeudado $ "/>
+                        <field name="totales"/>
+                    </h4>
+                    
+                    <!-- Mostrar facturas por vencer -->
+                    <h4>Detalle de facturas por vencer:</h4>
+                    <field name="facturas_in">
+                        <tree editable="false">
+                            <field name="sii_document_number" string="Número de Factura"/>
+                            <field name="invoice_date_due" string="Fecha de Vencimiento"/>
+                            <field name="amount_residual_signed" string="Monto"/>
+                        </tree>
+                    </field>
+                    
+                    <!-- Mostrar facturas vencidas -->
+                    <h4>Detalle de facturas vencidas:</h4>
+                    <field name="facturas_out">
+                        <tree editable="false">
+                            <field name="sii_document_number" string="Número de Factura"/>
+                            <field name="invoice_date_due" string="Fecha de Vencimiento"/>
+                            <field name="amount_residual_signed" string="Monto"/>
+                        </tree>
+                    </field>
+
+                    <footer>
+                        <button string="Imprimir" name="action_print_report" type="object" default_focus="1" class="btn-primary"/>
+                        <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </form>
             </field>
         </record>
-        <record id="action_estadopago" model="ir.actions.act_window">
-            <field name="name">Estados de Pago</field>
-            <field name="res_model">wizard.estadopago</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="view_mode">form</field>
-            <field name="target">new</field>
-        </record>
-        <menuitem id="estados_menu"
-            parent=""
-            action="action_estadopago" />
     </data>
 </odoo>
