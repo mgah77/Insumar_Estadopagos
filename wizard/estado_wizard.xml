@@ -9,7 +9,7 @@
                 <group>
                 <field name="cliente" />
                 </group>
-                <br/><br/>
+                <br/>
                         <h4>Facturas vencidas</h4>
                         <label for="fac_vencido" string="Cantidad "/>
                         <field name="fac_vencido"/>
