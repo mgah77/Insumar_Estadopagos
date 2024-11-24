@@ -46,7 +46,7 @@ class EstadoWizard(models.TransientModel):
         return
 
     def action_print_report(self):
-        report = self.env.ref('Insumar_Estadopagos.action_payment_report')  # Reemplaza con el nombre correcto de tu informe
         for record in self:
             record._compute_cantidad_vencida()
+        report = self.env.ref('Insumar_Estadopagos.action_payment_report')  # Reemplaza con el nombre correcto de tu informe
         return report.with_context(active_ids=self.ids, active_model=self._name).report_action(self)
