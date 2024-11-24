@@ -15,7 +15,7 @@
                         <field name="fac_vencido"/>
                         <field name="facturas_out">
                             <tree editable="false">
-                                <field name="sii_document_number" string="Número de Factura" style="text-align: left;"/>
+                                <field name="sii_document_number" string="Número de Factura" align="left"/>
                                 <field name="invoice_date_due" string="Fecha de Vencimiento"/>
                                 <field name="amount_residual_signed" string="Monto" digits="0"/>
                             </tree>
@@ -28,7 +28,7 @@
                         <field name="pre_fac_vencido"/>
                             <field name="facturas_in">
                             <tree editable="false">
-                                <field name="sii_document_number" string="Número de Factura" style="text-align: left;"/>
+                                <field name="sii_document_number" string="Número de Factura" align="left"/>
                                 <field name="invoice_date_due" string="Fecha de Vencimiento"/>
                                 <field name="amount_residual_signed" string="Monto" digits="0"/>
                             </tree>
