@@ -32,7 +32,7 @@ class EstadoWizard(models.TransientModel):
                 record.pre_vencido = total_pre_vencido
                 pre_total = Invoice.search([('partner_id', '=', record.cliente.id),('move_type', '=', 'out_invoice'),('payment_state', '=', 'not_paid')])
                 totales = sum(factura.amount_residual_signed for factura in pre_total)
-                record.totales = totales
+                record.totales = totales                
                 record.facturas_out = Invoice.search([('partner_id', '=', record.cliente.id), ('move_type', '=', 'out_invoice'), ('payment_state', '=', 'not_paid'),('invoice_date_due', '<', fields.Date.today())])
                 record.facturas_in = Invoice.search([('partner_id', '=', record.cliente.id), ('move_type', '=', 'out_invoice'), ('payment_state', '=', 'not_paid'),('invoice_date_due', '>=', fields.Date.today())])
             else:
@@ -41,6 +41,8 @@ class EstadoWizard(models.TransientModel):
                 record.pre_fac_vencido = 0
                 record.pre_vencido = 0
                 record.totales = 0
+                record.facturas_out = [(5, 0, 0)]  # Limpiar las relaciones
+                record.facturas_in = [(5, 0, 0)]
         return
 
     def action_print_report(self):
