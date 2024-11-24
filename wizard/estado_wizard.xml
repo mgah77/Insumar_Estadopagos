@@ -14,7 +14,7 @@
                         <label for="fac_vencido" string="Cantidad "/>
                         <field name="fac_vencido"/>
                         <field name="facturas_out">
-                            <tree editable="false">
+                            <tree create="false" delete="false" editable="false">
                                 <field name="sii_document_number" string="Número de Factura" />
                                 <field name="invoice_date_due" string="Fecha de Vencimiento"/>
                                 <field name="amount_residual_signed" string="Monto"/>
