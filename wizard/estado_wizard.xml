@@ -25,7 +25,7 @@
                         <field name="pre_vencido"/>
                         <br /><br />
                         <h3>
-                        
+                        <label for="totales" string="Total Adeudado $ "/>
                         <field name="totales"/>
                         </h3>
                 <footer>
