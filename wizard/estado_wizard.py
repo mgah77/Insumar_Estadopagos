@@ -41,8 +41,8 @@ class EstadoWizard(models.TransientModel):
                 record.pre_fac_vencido = 0
                 record.pre_vencido = 0
                 record.totales = 0
-                record.facturas_out = []  # Limpiar las relaciones
-                #record.facturas_in = []
+                record.facturas_out = []
+                record.facturas_in = []
         return
 
     def action_print_report(self):
@@ -52,16 +52,30 @@ class EstadoWizard(models.TransientModel):
         return report.with_context(active_ids=self.ids, active_model=self._name).report_action(self)
 
 
-    detalles_facturas_out = fields.Text(string="Detalles de Facturas Vencidas", compute="_compute_detalles_facturas")
+    detalles_facturas_out = fields.Text(string="Detalles de Facturas Vencidas", compute="_compute_detalles_facturas_out")
 
     @api.depends('facturas_out')
-    def _compute_detalles_facturas(self):
+    def _compute_detalles_facturas_out(self):
         for record in self:
             detalles = ""
             for factura in record.facturas_out:
                 detalles += (
                     f"Factura: {factura.sii_document_number or 'N/A'}, "
                     f"Vencimiento: {factura.invoice_date_due.strftime('%d-%b-%Y') if factura.invoice_date_due else 'Sin fecha'}, "
-                    f"Monto: ${factura.amount_residual_signed:,.0f}\n"
+                    f"Monto: ${factura.amount_residual_signed:,.0f}".replace(",", ".") + "\n"
                 )
             record.detalles_facturas_out = detalles
+
+    detalles_facturas_in = fields.Text(string="Detalles de Facturas Vencidas", compute="_compute_detalles_facturas_in")
+
+    @api.depends('facturas_in')
+    def _compute_detalles_facturas_in(self):
+        for record in self:
+            detalles = ""
+            for factura in record.facturas_in:
+                detalles += (
+                    f"Factura: {factura.sii_document_number or 'N/A'}, "
+                    f"Vencimiento: {factura.invoice_date_due.strftime('%d-%b-%Y') if factura.invoice_date_due else 'Sin fecha'}, "
+                    f"Monto: ${factura.amount_residual_signed:,.0f}".replace(",", ".") + "\n"
+                )
+            record.detalles_facturas_in = detalles

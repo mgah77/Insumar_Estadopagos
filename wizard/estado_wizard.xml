@@ -20,13 +20,7 @@
                         <h4>Facturas por vencer</h4>
                         <label for="pre_fac_vencido" string="Cantidad "/>
                         <field name="pre_fac_vencido"/>
-                            <!--field name="facturas_in">
-                            <tree editable="false">
-                                <field name="sii_document_number" string="Número de Factura"/>
-                                <field name="invoice_date_due" string="Fecha de Vencimiento"/>
-                                <field name="amount_residual_signed" string="Monto"/>
-                            </tree>
-                            </field!-->
+                        <field name="detalles_facturas_out" widget="text" />                           
                         <label for="pre_vencido" string=", Valor adeudado $ "/>
                         <field name="pre_vencido"/>
                         <br /><br />
