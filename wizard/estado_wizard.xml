@@ -7,7 +7,7 @@
             <field name="arch" type="xml">
             <form>
                 <group>
-                <field name="cliente" create="false"/>
+                <field name="cliente" options="{'no_create': True}"/>
                 </group>
                 <br/>
                         <h4>Facturas vencidas</h4>
