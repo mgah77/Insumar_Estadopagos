@@ -13,13 +13,7 @@
                         <h4>Facturas vencidas</h4>
                         <label for="fac_vencido" string="Cantidad "/>
                         <field name="fac_vencido"/>
-                        <field name="facturas_out">
-                            <tree create="false" delete="false" editable="false">
-                                <field name="sii_document_number" string="Número de Factura" />
-                                <field name="invoice_date_due" string="Fecha de Vencimiento"/>
-                                <field name="amount_residual_signed" string="Monto"/>
-                            </tree>
-                            </field>
+                        <field name="detalles_facturas_out" widget="text" />
                         <label for="vencido" string=", Valor adeudado $ "/>
                         <field name="vencido"/>
                         <h4> </h4>

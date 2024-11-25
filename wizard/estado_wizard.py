@@ -50,3 +50,18 @@ class EstadoWizard(models.TransientModel):
             record._compute_cantidad_vencida()
         report = self.env.ref('Insumar_Estadopagos.action_payment_report')  # Reemplaza con el nombre correcto de tu informe
         return report.with_context(active_ids=self.ids, active_model=self._name).report_action(self)
+
+
+    detalles_facturas_out = fields.Text(string="Detalles de Facturas Vencidas", compute="_compute_detalles_facturas")
+
+    @api.depends('facturas_out')
+    def _compute_detalles_facturas(self):
+        for record in self:
+            detalles = ""
+            for factura in record.facturas_out:
+                detalles += (
+                    f"Factura: {factura.sii_document_number or 'N/A'}, "
+                    f"Vencimiento: {factura.invoice_date_due.strftime('%d-%b-%Y') if factura.invoice_date_due else 'Sin fecha'}, "
+                    f"Monto: ${factura.amount_residual_signed:,.0f}\n"
+                )
+            record.detalles_facturas_out = detalles
