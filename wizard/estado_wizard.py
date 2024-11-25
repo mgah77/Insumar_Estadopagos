@@ -10,7 +10,7 @@ class EstadoWizard(models.TransientModel):
     vencido = fields.Float(string="Cantidad Vencida", compute='_compute_cantidad_vencida', digits=(16, 0))
     pre_fac_vencido = fields.Integer(string="Facturas por vencer", compute='_compute_cantidad_vencida')
     pre_vencido = fields.Float(string="Cantidad por vencer", compute='_compute_cantidad_vencida', digits=(16, 0))
-    totales = fields.Float(string="Total Deuda", compute='_compute_cantidad_vencida', digits=(16, 0))
+    totales = fields.Float(string="Total adeudado $ ", compute='_compute_cantidad_vencida', digits=(16, 0))
     facturas_out = fields.One2many('account.move', compute='_compute_cantidad_vencida', string="Facturas")
     facturas_in = fields.One2many('account.move', compute='_compute_cantidad_vencida', string="Facturas")
 
