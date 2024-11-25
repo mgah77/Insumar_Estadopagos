@@ -20,7 +20,7 @@
                         <h4>Facturas por vencer</h4>
                         <label for="pre_fac_vencido" string="Cantidad "/>
                         <field name="pre_fac_vencido"/>
-                        <field name="detalles_facturas_out" widget="text" />                           
+                        <field name="detalles_facturas_in" widget="text" />                           
                         <label for="pre_vencido" string=", Valor adeudado $ "/>
                         <field name="pre_vencido"/>
                         <br /><br />
