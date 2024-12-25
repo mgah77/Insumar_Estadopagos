@@ -15,9 +15,9 @@
                 <t t-call="web.basic_layout">
                     <!-- Contenido del informe -->
                      <div class="header">
-                            <div style="position: absolute; top: 10px; left: 10px; width: 200px; height: auto;">
+                            <div style="position: absolute; top: 10px; left: 10px; width: 100px; height: auto;">
                                     <img t-att-src="'/web/image/res.company/1/logo'" 
-                                        style="width: auto; height: auto;" 
+                                        style="width: 200px; height: auto;" 
                                         alt="Company Logo"/>
                                 </div> 
                     </div>
