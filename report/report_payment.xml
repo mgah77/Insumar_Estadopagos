@@ -80,7 +80,7 @@
                         </tbody>
                         </table>
                         <div style="position: absolute; bottom: 0; left: 0; width: 100%; text-align: center;">
-                            <img t-att-src="'/your_module_name/static/src/img/footer_image.png'" 
+                            <img t-att-src="'/Insumar_Estadopagos/static/src/img/footer.png'" 
                                  style="width: 100%; height: auto;" 
                                  alt="Footer Image"/>
                         </div>
