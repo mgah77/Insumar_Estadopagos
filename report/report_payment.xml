@@ -14,12 +14,15 @@
             <t t-foreach="docs" t-as="doc">
                 <t t-call="web.basic_layout">
                     <!-- Contenido del informe -->
+                     <div class="header">
+                            <div style="position: absolute; top: 10px; left: 10px; width: 100px; height: auto;">
+                                    <img t-att-src="'/web/image/res.company/1/logo'" 
+                                        style="width: 100px; height: auto;" 
+                                        alt="Company Logo"/>
+                                </div> 
+                    </div>
                      <div class="page" style="padding-bottom: 250px;">
-                     <div style="position: absolute; top: 10px; left: 10px; width: 100px; height: auto;">
-                            <img t-att-src="'/web/image/res.company/1/logo'" 
-                                 style="width: 100px; height: auto;" 
-                                 alt="Company Logo"/>
-                        </div>
+                     
                         <br />
                         <center><h1><ins>Informe de Estado de pagos</ins></h1></center>    
                                          
