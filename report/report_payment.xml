@@ -79,6 +79,11 @@
                             <tr><td></td><td><h3>Total Deuda</h3></td><td><h3>$<span t-esc="'{:.0f}'.format(doc.totales)"/></h3></td></tr>                         
                         </tbody>
                         </table>
+                        <div style="text-align: center; margin-top: 20px;">
+                            <img t-att-src="'/Insumar_Estadopagos/static/src/img/footer.png'" 
+                                 style="width: 100%; max-width: 100%; height: auto;" 
+                                 alt="Footer Image"/>
+                        </div>
                     </div>
                 </t>
             </t>
