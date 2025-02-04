@@ -46,6 +46,6 @@
         <menuitem id="estados_menu"
             parent=""
             action="action_estadopago"
-            groups="taller.group_addon_estadopago" />            
+            groups="Insumar_Estadopagos.group_addon_estadopago" />            
     </data>
 </odoo>
