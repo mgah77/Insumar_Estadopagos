@@ -45,6 +45,7 @@
         </record>
         <menuitem id="estados_menu"
             parent=""
-            action="action_estadopago" />
+            action="action_estadopago"
+            groups="taller.group_addon_estadopago" />            
     </data>
 </odoo>
