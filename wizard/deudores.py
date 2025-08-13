@@ -26,6 +26,6 @@ class InsumarDeudoresWizard(models.TransientModel):
             "team_name": team_name,
             "today": date.today().isoformat(),
         }
-        return self.env.ref("insumar_estadopagos.report_deudores").report_action(
+        return self.env.ref("Insumar_Estadopagos.report_deudores").report_action(
             None, data=data
         )
