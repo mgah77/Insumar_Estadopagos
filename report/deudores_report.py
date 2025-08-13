@@ -8,27 +8,19 @@ class ReportDeudores(models.AbstractModel):
 
     @api.model
     def _get_report_values(self, docids, data=None):
-        """Construye el dataset agrupado por cliente.
-
-        Criterios:
-          - account.move (out_invoice) 'posted'
-          - amount_residual > 0 (no pagadas / con saldo)
-          - invoice_date_due > hoy (vencimiento futuro)
-          - team_id == seleccionado
-        """
-        if not data:
-            data = {}
+        data = data or {}
         team_id = data.get("team_id")
-        team_name = data.get("team_name") or ""
+        team_name = data.get("team_name", "")
         today = fields.Date.context_today(self)
 
-        domain = [
-            ("move_type", "=", "out_invoice"),
-        ]
+        # Dominio mínimo (ajusta luego si quieres)
+        domain = [("move_type", "=", "out_invoice")]
+        if team_id:
+            domain.append(("team_id", "=", team_id))
 
-        moves = self.env["account.move"].search([('move_type', '=', 'out_invoice')])
+        # sudo() para evitar bloqueos por permisos al leer facturas
+        moves = self.env["account.move"].sudo().search(domain, order="partner_id, name")
 
-        # Agrupar por partner
         grouped = defaultdict(list)
         partners = {}
         for m in moves:
@@ -41,31 +33,33 @@ class ReportDeudores(models.AbstractModel):
                 "amount_total": m.amount_total,
                 "abono": abono,
                 "amount_residual": m.amount_residual,
+                "company_currency": m.company_currency_id,
             })
 
-        # Ordenar clientes por document_number ascendente
-        # Si no hay document_number, usar cadena vacía para ordenar consistente.
         sorted_partner_ids = sorted(
             partners.keys(),
-            key=lambda pid: (partners[pid].document_number or "", partners[pid].name or "")
+            key=lambda pid: (
+                (partners[pid].document_number or "").strip(),
+                partners[pid].name or "",
+            ),
         )
 
-        items = [{
-            "partner": self.env["res.partner"].search([], limit=1),
-            "partner_label": "PRUEBA - Cliente",
-            "lines": [{
-                "name": "FAC0001",
-                "invoice_date": "2025-08-13",
-                "invoice_date_due": "2025-08-20",
-                "amount_total": 1000,
-                "abono": 200,
-                "amount_residual": 800,
-                "company_currency": self.env.company.currency_id,
-            }]
-        }]
+        groups = []
+        for pid in sorted_partner_ids:
+            p = partners[pid]
+            groups.append({
+                "partner": p,
+                "partner_label": f"{(p.document_number or '').strip()} - {p.name or ''}",
+                "lines": grouped[pid],
+            })
+
+        docs = self.env["insumar.deudores.wizard"].browse(docids or [])
 
         return {
+            "doc_ids": docids or [],
+            "doc_model": "insumar.deudores.wizard",
+            "docs": docs,
             "team_name": team_name,
             "today": today,
-            "items": items,
+            "groups": groups,
         }
