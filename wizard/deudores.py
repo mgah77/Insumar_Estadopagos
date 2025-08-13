@@ -31,4 +31,5 @@ class WizardEstadoPagoSucursal(models.TransientModel):
             'sucursal': dict(self._fields['sucursal'].selection).get(self.sucursal),
             'grouped': sorted(grouped.items(), key=lambda x: x[0][0]),  # por document_number asc
         }
-        return self.env.ref('Insumar_Estadopagos.report_estado_pago_pdf').report_action(self, data=data)
+        return self.env.ref('Insumar_Estadopagos.report_estado_pago_pdf').report_action(self, data={'docs': data})
+
