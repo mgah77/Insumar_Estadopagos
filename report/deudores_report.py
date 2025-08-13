@@ -26,7 +26,6 @@ class ReportDeudores(models.AbstractModel):
             ("move_type", "=", "out_invoice"),
             ("state", "=", "posted"),
             ("amount_residual", ">", 0.0),
-            ("invoice_date_due", ">", today),
             ("team_id", "=", team_id),
         ]
 
