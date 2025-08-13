@@ -40,4 +40,4 @@ class WizardEstadoPagoSucursal(models.TransientModel):
         if not data['sucursal']:
             raise ValueError("Sucursal name is empty!")
         
-        return self.env.ref('Insumar_Estadopagos.report_estado_pago_pdf').report_action(self, data=data)
+        return self.env.ref('Insumar_Estadopagos.report_estado_pago_pdf_template').report_action(self, data=data)
