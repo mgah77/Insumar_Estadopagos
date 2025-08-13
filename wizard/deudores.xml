@@ -1,3 +1,4 @@
+<odoo>
 <!-- views/estado_pago_wizard_view.xml -->
 <record id="view_estado_pago_wizard" model="ir.ui.view">
     <field name="name">estado.pago.sucursal.wizard.form</field>
@@ -28,3 +29,4 @@
           parent="account.menu_finance_receivables"
           action="action_estado_pago_sucursal"
           sequence="99"/>
+</odoo>

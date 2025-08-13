@@ -1,3 +1,4 @@
+<odoo>
 <!-- reports/reporte_estado_pago_action.xml -->
 <report
     id="report_estado_pago_pdf"
@@ -51,3 +52,4 @@
         </t>
     </t>
 </template>
+</odoo>
