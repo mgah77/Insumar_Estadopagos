@@ -12,7 +12,7 @@
     <t t-call="web.html_container">
         <t t-call="web.external_layout">
             <div class="page">
-                <h2>Estado pago sucursal <t t-esc="data['sucursal']"/></h2>
+                <h2>Estado pago sucursal <t t-esc="data.get('sucursal', '')"/></h2>
                 <t t-foreach="data['grouped']" t-as="group">
                     <div style="margin-top:20px;">
                         <h4><t t-esc="group[0][0]"/> - <t t-esc="group[0][1]"/></h4>
