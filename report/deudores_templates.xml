@@ -11,7 +11,7 @@
                 <div t-if="not items">
                     <p>No hay facturas que cumplan los criterios.</p>
                 </div>
-
+                <p>Items recibidos: <t t-esc="items"/></p>
                 <t t-foreach="items" t-as="it">
                     <h4 style="margin-top: 16px; margin-bottom: 6px;">
                         <t t-esc="it['partner_label']"/>
