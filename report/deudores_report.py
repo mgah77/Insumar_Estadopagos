@@ -50,14 +50,19 @@ class ReportDeudores(models.AbstractModel):
             key=lambda pid: (partners[pid].document_number or "", partners[pid].name or "")
         )
 
-        items = []
-        for pid in sorted_partner_ids:
-            p = partners[pid]
-            items.append({
-                "partner": p,
-                "partner_label": f"{(p.document_number or '').strip()} - {p.name or ''}",
-                "lines": grouped[pid],
-            })
+        items = [{
+            "partner": self.env["res.partner"].search([], limit=1),
+            "partner_label": "PRUEBA - Cliente",
+            "lines": [{
+                "name": "FAC0001",
+                "invoice_date": "2025-08-13",
+                "invoice_date_due": "2025-08-20",
+                "amount_total": 1000,
+                "abono": 200,
+                "amount_residual": 800,
+                "company_currency": self.env.company.currency_id,
+            }]
+        }]
 
         return {
             "team_name": team_name,
