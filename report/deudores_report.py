@@ -24,12 +24,9 @@ class ReportDeudores(models.AbstractModel):
 
         domain = [
             ("move_type", "=", "out_invoice"),
-            ("state", "=", "posted"),
-            ("amount_residual", ">", 0.0),
-            ("team_id", "=", team_id),
         ]
 
-        moves = self.env["account.move"].search(domain, order="partner_id, invoice_date_due, name")
+        moves = self.env["account.move"].search(domain, order="partner_id, name")
 
         # Agrupar por partner
         grouped = defaultdict(list)
