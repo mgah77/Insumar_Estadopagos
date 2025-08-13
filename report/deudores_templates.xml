@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-
-    <template id="deudores">
-        <t t-call="web.external_layout">
+<template id="deudores">
+    <t t-call="web.external_layout">
+        <main>
             <div class="page">
                 <h2 style="margin-bottom: 8px;">
                     <t t-esc="'Estado pago sucursal %s' % team_name"/>
                 </h2>
+
                 <div t-if="not items">
                     <p>No hay facturas que cumplan los criterios.</p>
                 </div>
@@ -39,13 +40,13 @@
                                         <span t-esc="ln['invoice_date_due']"/>
                                     </td>
                                     <td style="text-align:right; padding:4px;">
-                                        <span t-esc="format_amount(ln['amount_total'], it['partner'].company_id.currency_id)"/>
+                                        <span t-esc="format_amount(ln['amount_total'], ln['company_currency'])"/>
                                     </td>
                                     <td style="text-align:right; padding:4px;">
-                                        <span t-esc="format_amount(ln['abono'], it['partner'].company_id.currency_id)"/>
+                                        <span t-esc="format_amount(ln['abono'], ln['company_currency'])"/>
                                     </td>
                                     <td style="text-align:right; padding:4px;">
-                                        <span t-esc="format_amount(ln['amount_residual'], it['partner'].company_id.currency_id)"/>
+                                        <span t-esc="format_amount(ln['amount_residual'], ln['company_currency'])"/>
                                     </td>
                                 </tr>
                             </t>
@@ -53,7 +54,8 @@
                     </table>
                 </t>
             </div>
-        </t>
-    </template>
+        </main>
+    </t>
+</template>
 
 </odoo>
