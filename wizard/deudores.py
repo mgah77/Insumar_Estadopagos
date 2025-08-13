@@ -21,15 +21,23 @@ class WizardEstadoPagoSucursal(models.TransientModel):
             ('invoice_date_due', '>', today),
             ('team_id', '=', team_id),
         ])
+        
         grouped = {}
         for factura in facturas:
             partner = factura.partner_id
             key = (partner.document_number or '', partner.name or '')
             grouped.setdefault(key, []).append(factura)
 
+        # Ensure we have a default value if selection lookup fails
+        sucursal_name = dict(self._fields['sucursal'].selection).get(self.sucursal, self.sucursal)
+        
         data = {
-            'sucursal': dict(self._fields['sucursal'].selection).get(self.sucursal),
+            'sucursal': sucursal_name,
             'grouped': sorted(grouped.items(), key=lambda x: x[0][0]),  # por document_number asc
         }
+        
+        # Add debug check
+        if not data['sucursal']:
+            raise ValueError("Sucursal name is empty!")
+        
         return self.env.ref('Insumar_Estadopagos.report_estado_pago_pdf').report_action(self, data=data)
-
