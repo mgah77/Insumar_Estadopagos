@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <record id="report_deudores" model="ir.actions.report">
+        <field name="name">report_deudores</field>
+        <field name="model">account.move</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">insumar_estadopagos.deudores</field>
+        <field name="report_file">insumar_estadopagos.deudores</field>
+        <field name="print_report_name">'Estado pago sucursal %s' % (doc.ids and doc[0].company_id.name or '')</field>
+        <field name="binding_model_id" ref="account.model_account_move"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</odoo>

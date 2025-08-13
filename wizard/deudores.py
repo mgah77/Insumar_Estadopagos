@@ -1,43 +1,31 @@
-# wizards/reporte_estado_pago.py
-from odoo import models, fields
+# -*- coding: utf-8 -*-
+from odoo import api, fields, models, _
 from datetime import date
 
-class WizardEstadoPagoSucursal(models.TransientModel):
-    _name = 'estado.pago.sucursal.wizard'
-    _description = 'Wizard Estado Pago por Sucursal'
+class InsumarDeudoresWizard(models.TransientModel):
+    _name = "insumar.deudores.wizard"
+    _description = "Wizard de Deudores por Sucursal"
 
-    sucursal = fields.Selection([
-        ('1', 'Par Vial'),
-        ('5', 'Ñuble'),
-    ], string='Sucursal', required=True)
+    team_selection = fields.Selection(
+        selection=[
+            ("5", "Ñuble"),
+            ("1", "Par Vial"),
+        ],
+        string="Sucursal",
+        required=True,
+        default="5",
+        help="Seleccione la sucursal para filtrar por team_id.",
+    )
 
-    def imprimir_reporte(self):
-        team_id = int(self.sucursal)
-        today = date.today()
-        facturas = self.env['account.move'].search([
-            ('move_type', '=', 'out_invoice'),
-            ('state', '=', 'posted'),
-            ('payment_state', '!=', 'paid'),
-            ('invoice_date_due', '>', today),
-            ('team_id', '=', team_id),
-        ])
-        
-        grouped = {}
-        for factura in facturas:
-            partner = factura.partner_id
-            key = (partner.document_number or '', partner.name or '')
-            grouped.setdefault(key, []).append(factura)
-
-        # Ensure we have a default value if selection lookup fails
-        sucursal_name = dict(self._fields['sucursal'].selection).get(self.sucursal, self.sucursal)
-        
+    def action_print_report(self):
+        self.ensure_one()
+        team_id = int(self.team_selection)
+        team_name = "Ñuble" if team_id == 5 else "Par Vial"
         data = {
-            'sucursal': sucursal_name,
-            'grouped': sorted(grouped.items(), key=lambda x: x[0][0]),  # por document_number asc
+            "team_id": team_id,
+            "team_name": team_name,
+            "today": date.today().isoformat(),
         }
-        
-        # Add debug check
-        if not data['sucursal']:
-            raise ValueError("Sucursal name is empty!")
-        
-        return self.env.ref('Insumar_Estadopagos.report_estado_pago_pdf_template').report_action(self, data=data)
+        return self.env.ref("insumar_estadopagos.report_deudores").report_action(
+            None, data=data
+        )

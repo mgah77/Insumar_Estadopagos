@@ -10,9 +10,9 @@
 'data': ['security/groups.xml',
          'security/ir.model.access.csv',
          'report/report_payment.xml',
-         'report/report_deudores.xml',
-         'wizard/estado_wizard.xml',
-         'wizard/deudores.xml'
+         "wizard/deudores_views.xml",
+         "data/report_action.xml",
+         "report/deudores_templates.xml"
 ],
 'depends': ['base' , 'contacts' , 'account', 'parches_insumar']
 }
