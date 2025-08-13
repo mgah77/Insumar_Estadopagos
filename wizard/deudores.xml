@@ -1,0 +1,30 @@
+<!-- views/estado_pago_wizard_view.xml -->
+<record id="view_estado_pago_wizard" model="ir.ui.view">
+    <field name="name">estado.pago.sucursal.wizard.form</field>
+    <field name="model">estado.pago.sucursal.wizard</field>
+    <field name="arch" type="xml">
+        <form string="Estado de Pago por Sucursal">
+            <group>
+                <field name="sucursal"/>
+            </group>
+            <footer>
+                <button string="Imprimir Informe" type="object" name="imprimir_reporte" class="btn-primary"/>
+                <button string="Cancelar" class="btn-secondary" special="cancel"/>
+            </footer>
+        </form>
+    </field>
+</record>
+
+<!-- views/estado_pago_action_menu.xml -->
+<record id="action_estado_pago_sucursal" model="ir.actions.act_window">
+    <field name="name">Estado de Pago por Sucursal</field>
+    <field name="res_model">estado.pago.sucursal.wizard</field>
+    <field name="view_mode">form</field>
+    <field name="target">new</field>
+</record>
+
+<menuitem id="menu_estado_pago_sucursal"
+          name="Estado de Pago Sucursal"
+          parent="account.menu_finance_receivables"
+          action="action_estado_pago_sucursal"
+          sequence="99"/>
