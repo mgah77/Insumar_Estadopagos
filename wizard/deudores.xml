@@ -1,0 +1,35 @@
+<odoo>
+    <record id="action_estado_pagos_wizard" model="ir.actions.act_window">
+        <field name="name">Estado de Pagos</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">insumar.estadopagos.deudores.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_sucursal': '1'}</field>
+    </record>
+
+    <menuitem 
+        id="menu_estado_pagos" 
+        name="Estado de Pagos" 
+        parent="account.menu_action_account_invoice_report_all" 
+        action="action_estado_pagos_wizard" 
+        sequence="10"/>
+        
+    <record id="view_estado_pagos_wizard_form" model="ir.ui.view">
+        <field name="name">insumar.estadopagos.deudores.wizard.form</field>
+        <field name="model">insumar.estadopagos.deudores.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Generar Reporte de Estado de Pagos">
+                <sheet>
+                    <group>
+                        <field name="sucursal" widget="radio" options="{'horizontal': true}"/>
+                    </group>
+                    <footer>
+                        <button name="generar_reporte" string="Imprimir Informe" type="object" class="btn-primary"/>
+                        <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                    </footer>
+                </sheet>
+            </form>
+        </field>
+    </record>
+</odoo>
