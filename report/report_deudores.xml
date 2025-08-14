@@ -1,17 +1,17 @@
 <odoo>
     <template id="report_deudores_template">
         <t t-call="web.html_container">
-            <t t-call="web.external_layout">
+            <t t-call="web.basic_layout">
                 <div class="page">
-                    <h3 style="text-align: center;">Estado pago sucursal <t t-esc="sucursal_nombre"/></h3>
+                    <h5 style="text-align: center;">Estado pago sucursal <t t-esc="sucursal_nombre"/></h5>
                     <p style="text-align: center; font-style: italic;">Fecha: <t t-esc="fecha_actual"/></p>
                     
                     <t t-foreach="clientes" t-as="cliente">
-                        <h4 style="margin-top: 20px;">
+                        <h6 style="margin-top: 20px;">
                             <t t-esc="cliente['document_number']"/> - <t t-esc="cliente['name']"/>
-                        </h4>
+                        </h6>
                         
-                        <table class="table table-bordered" style="width: 100%; margin-bottom: 20px;">
+                        <table class="table table-bordered" style="width: 100%; margin-bottom: 15px;">
                             <thead>
                                 <tr>
                                     <th>Factura</th>
