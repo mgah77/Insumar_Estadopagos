@@ -48,6 +48,5 @@
         report_type="qweb-pdf"
         name="Insumar_Estadopagos.report_deudores_template"
         file="Insumar_Estadopagos.report_deudores_template"
-        attachment_use="False"
-        paperformat="a4"/>
+        attachment_use="False"/>
 </odoo>
