@@ -10,7 +10,7 @@
 
     <menuitem 
         id="menu_estado_pagos" 
-        name="Estado de Pagos" 
+        name="Informe de pagos adeudados" 
         parent="account.menu_finance_receivables"
         action="action_estado_pagos_wizard"
         groups="Insumar_Estadopagos.group_addon_estadopago"

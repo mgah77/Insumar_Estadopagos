@@ -37,7 +37,7 @@ class DeudoresWizard(models.TransientModel):
             
             abono = factura.amount_total - factura.amount_residual
             clientes[partner.id]['facturas'].append({
-                'name': factura.name,
+                'name': factura.sii_document_number,
                 'invoice_date': factura.invoice_date.strftime('%d/%m/%Y') if factura.invoice_date else '',
                 'invoice_date_due': factura.invoice_date_due.strftime('%d/%m/%Y') if factura.invoice_date_due else '',
                 'amount_total': factura.amount_total,
