@@ -20,7 +20,6 @@ class DeudoresWizard(models.TransientModel):
         
         facturas = self.env['account.move'].search([
             ('payment_state', '!=', 'paid'),
-            ('invoice_date_due', '>', date.today()),
             ('team_id', '=', int(self.sucursal)),
             ('move_type', '=', 'out_invoice'),
             ('state', '=', 'posted'),
