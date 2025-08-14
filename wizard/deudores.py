@@ -21,7 +21,7 @@ class DeudoresWizard(models.TransientModel):
         facturas = self.env['account.move'].search([
             ('payment_state', '!=', 'paid'),
             ('team_id', '=', int(self.sucursal)),
-            ('move_type', '=', 'out_invoice'),
+            ('move_type', '=', 'in_invoice'),
             ('state', '=', 'posted'),
         ], order='partner_id')
         
