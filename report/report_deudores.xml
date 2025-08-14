@@ -2,10 +2,11 @@
     <template id="report_deudores_template">
         <t t-call="web.html_container">
             <t t-call="web.basic_layout">
-                <div class="page" style="padding-top: -130px;">
-                    <h5 style="text-align: center;">Estado pago sucursal <t t-esc="sucursal_nombre"/></h5>
+                <div class="header" >
+                     <h5 style="text-align: center;">Estado pago sucursal <t t-esc="sucursal_nombre"/></h5>
                     <p style="text-align: center; font-style: italic;">Fecha: <t t-esc="fecha_actual"/></p>
-                    
+                </div>
+                <div class="page" >                                       
                     <t t-foreach="clientes" t-as="cliente">
                         <h6 style="margin-top: 20px;">
                             <t t-esc="cliente['document_number']"/> - <t t-esc="cliente['name']"/>
