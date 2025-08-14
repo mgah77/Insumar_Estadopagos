@@ -11,9 +11,10 @@
     <menuitem 
         id="menu_estado_pagos" 
         name="Estado de Pagos" 
-        parent="account.menu_action_account_invoice_report_all" 
-        action="action_estado_pagos_wizard" 
-        sequence="10"/>
+        parent="account.menu_finance_receivables"
+        action="action_estado_pagos_wizard"
+        groups="Insumar_Estadopagos.group_addon_estadopago"
+        sequence="99"/>
         
     <record id="view_estado_pagos_wizard_form" model="ir.ui.view">
         <field name="name">insumar.estadopagos.deudores.wizard.form</field>

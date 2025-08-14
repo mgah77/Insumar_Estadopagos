@@ -31,7 +31,7 @@ class DeudoresWizard(models.TransientModel):
             partner = factura.partner_id
             if partner.id not in clientes:
                 clientes[partner.id] = {
-                    'document_number': partner.vat or 'Sin RUT',
+                    'document_number': partner.document_number or 'Sin RUT',
                     'name': partner.name,
                     'facturas': []
                 }

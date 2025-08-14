@@ -3,13 +3,13 @@
         <t t-call="web.html_container">
             <t t-call="web.internal_layout">
                 <div class="page">
-                    <h2 style="text-align: center;">Estado pago sucursal <t t-esc="sucursal_nombre"/></h2>
+                    <h3 style="text-align: center;">Estado pago sucursal <t t-esc="sucursal_nombre"/></h3>
                     <p style="text-align: center; font-style: italic;">Fecha: <t t-esc="fecha_actual"/></p>
                     
                     <t t-foreach="clientes" t-as="cliente">
-                        <h3 style="margin-top: 20px;">
+                        <h4 style="margin-top: 20px;">
                             <t t-esc="cliente['document_number']"/> - <t t-esc="cliente['name']"/>
-                        </h3>
+                        </h4>
                         
                         <table class="table table-bordered" style="width: 100%; margin-bottom: 20px;">
                             <thead>
