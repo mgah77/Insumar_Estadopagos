@@ -43,7 +43,7 @@
     </template>
 
     <report 
-        id="report_clientes"
+        id="action_report_clientes"
         string="Reporte de Clientes"
         model="insumar.estadopagos.wizard"
         report_type="qweb-pdf"
