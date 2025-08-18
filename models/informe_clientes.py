@@ -75,7 +75,7 @@ class InformeClientesWizard(models.TransientModel):
           #   if self.date_from:
             #     domain += [("invoice_date", ">=", self.date_from)]
             # if self.date_to:
-                domain += [("invoice_date", "<=", self.date_to)]
+              #   domain += [("invoice_date", "<=", self.date_to)]
 
         return domain
 
