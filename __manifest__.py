@@ -10,12 +10,12 @@
 'data': ['security/groups.xml',
          'security/ir.model.access.csv',
          'wizard/estado_wizard.xml',
-        'wizard/deudores.xml',
-        'wizard/informe_clientes_wizard.xml',
+        'wizard/deudores.xml',        
         'report/report_deudores.xml',
-        'report/report_payment.xml',
-        'report/report_clientes.xml'
-
+        'report/report_payment.xml',        
+        "views/informe_clientes_views.xml",
+        "views/report_clientes_templates.xml"
+       
 ],
 'depends': ['base' , 'contacts' , 'account', 'parches_insumar']
 }

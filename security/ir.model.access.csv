@@ -2,3 +2,4 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_wizard_estadopago,access.wizard.estadopago,model_wizard_estadopago,,1,1,1,1
 access_insumar_estadopagos_deudores_wizard,insumar.estadopagos.deudores.wizard,Insumar_Estadopagos.model_insumar_estadopagos_deudores_wizard,base.group_user,1,0,1,0
 access_insumar_estadopagos_wizard,insumar.estadopagos.wizard,Insumar_Estadopagos.model_insumar_estadopagos_wizard,account.group_account_invoice,1,0,1,0
+access_informe_clientes_wizard_user,access.informe.clientes.wizard.user,Insumar_Estadopagos.model_informe_clientes_wizard,base.group_user,1,0,1,0
