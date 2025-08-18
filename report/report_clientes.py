@@ -1,7 +1,7 @@
 from odoo import models, fields, api
 
 class ReportClientes(models.AbstractModel):
-    _name = 'report.Insumar_Estadopagos.report_clientes'
+    _name = 'report.insumar_estadopagos.report_clientes'
     _description = 'Reporte de Estado de Pagos'
 
     def _get_report_values(self, docids, data=None):
