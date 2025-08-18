@@ -64,5 +64,5 @@ class InformeClientesWizard(models.TransientModel):
 
 
 class InformeClientesWizard2(models.TransientModel):
-    _name = 'informe_clientes_wizard'
+    _name = 'informe.clientes.wizard'
     _description = 'Wizard para generar informe de estado de pagos'
