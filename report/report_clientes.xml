@@ -1,0 +1,53 @@
+<odoo>
+    <template id="report_clientes_template">
+        <t t-call="web.html_container">
+            <t t-call="web.basic_layout">
+                <div class="header" >
+                     <h5 style="text-align: center;">Estado pago clientes <t t-esc="sucursal_nombre"/></h5>
+                    <p style="text-align: center; font-style: italic;">Facturas con vencimiento hasta: <t t-esc="fecha_corte"/></p>
+                </div>
+                <div class="page" >                                       
+                    <t t-foreach="clientes" t-as="cliente">
+                        <h6 style="margin-top: 20px;">
+                            <t t-esc="cliente['document_number']"/> - <t t-esc="cliente['name']"/>
+                        </h6>
+                        
+                        <table class="table table-bordered" style="width: 100%; margin-bottom: 15px;">
+                            <thead>
+                                <tr>
+                                    <th>Factura</th>
+                                    <th>Fecha Emisión</th>
+                                    <th>Fecha Vencimiento</th>
+                                    <th>Total</th>
+                                    <th>Abono</th>
+                                    <th>Saldo Pendiente</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="cliente['facturas']" t-as="factura">
+                                    <tr>
+                                        <td><t t-esc="factura['name']"/></td>
+                                        <td><t t-esc="factura['invoice_date']"/></td>
+                                        <td><t t-esc="factura['invoice_date_due']"/></td>
+                                        <td style="text-align: right;"><t t-esc="'${:,.0f}'.format(factura['amount_total'])"/></td>
+                                        <td style="text-align: right;"><t t-esc="'${:,.0f}'.format(factura['abono'])"/></td>
+                                        <td style="text-align: right;"><t t-esc="'${:,.0f}'.format(factura['amount_residual'])"/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </t>
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <report 
+        id="report_clientes"
+        string="Reporte de Clientes"
+        model="insumar.estadopagos.wizard"
+        report_type="qweb-pdf"
+        name="Insumar_Estadopagos.report_clientes_template"
+        file="Insumar_Estadopagos.report_clientes_template"
+        attachment_use="False"/>
+</odoo>

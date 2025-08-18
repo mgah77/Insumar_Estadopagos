@@ -13,8 +13,8 @@
         'wizard/deudores.xml',        
         'report/report_deudores.xml',
         'report/report_payment.xml',        
-        "views/informe_clientes_views.xml",
-        "views/report_clientes_templates.xml"
+        'report/report_clientes.xml',        
+        "wizard/informe_clientes_views.xml"
        
 ],
 'depends': ['base' , 'contacts' , 'account', 'parches_insumar']
