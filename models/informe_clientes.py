@@ -82,7 +82,7 @@ class InformeClientesWizard(models.TransientModel):
     def action_print_report(self):
         self.ensure_one()
         domain = self._compute_domain()
-        moves = self.env["account.move"].search(domain, order="invoice_date asc")
+        moves = self.env["account.move"].search(("move_type", "in", ["out_invoice", "out_refund"]), order="invoice_date asc")
 
         data = {
             "partner_id": self.partner_id.id,
