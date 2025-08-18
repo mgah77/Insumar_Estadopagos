@@ -24,6 +24,7 @@ class DeudoresWizard(models.TransientModel):
             'sucursal': self.sucursal,
             'sucursal_nombre': dict(self._fields['sucursal'].selection).get(self.sucursal),
             'fecha_actual': date.today().strftime('%d/%m/%Y'),
+            'fecha_corte': self.fecha_corte.strftime('%d/%m/%Y'), 
         }
         
         facturas = self.env['account.move'].search([
