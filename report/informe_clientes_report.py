@@ -8,12 +8,12 @@ class ReportClientes(models.AbstractModel):
     def _get_report_values(self, docids, data=None):
         data = data or {}
         move_ids = data.get("move_ids", [])
-        docs = self.env["account.move"].browse(move_ids)
+        #docs = self.env["account.move"].browse(move_ids)
         # asegurar orden por fecha ascendente
-        docs = docs.sorted(lambda m: (m.invoice_date or m.create_date or m.id, m.name or ""))
+        #docs = docs.sorted(lambda m: (m.invoice_date or m.create_date or m.id, m.name or ""))
 
         partner = self.env["res.partner"].browse(data.get("partner_id")) if data.get("partner_id") else False
-
+        docs = self.env["account.move"].search([("move_type", "in", ["out_invoice", "out_refund"]),("partner_id", "=", partner.id)], order="invoice_date asc")
         return {
             "doc_ids": move_ids,
             "doc_model": "account.move",
