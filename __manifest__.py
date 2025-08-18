@@ -11,8 +11,10 @@
          'security/ir.model.access.csv',
          'wizard/estado_wizard.xml',
         'wizard/deudores.xml',
+        'wizard/informe_clientes_wizard.xml',
         'report/report_deudores.xml',
-        'report/report_payment.xml'
+        'report/report_payment.xml',
+        'report/report_clientes.xml'
 
 ],
 'depends': ['base' , 'contacts' , 'account', 'parches_insumar']
