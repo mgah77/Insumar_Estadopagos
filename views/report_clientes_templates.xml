@@ -1,6 +1,6 @@
 <odoo>
     <template id="report_clientes">
-        <t t-call="web.external_layout">
+        <t t-call="web.basic_layout">
             <div class="page">
 
                 <h2>Informe de Clientes</h2>
