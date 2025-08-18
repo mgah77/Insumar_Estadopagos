@@ -44,6 +44,5 @@
         report_type="qweb-pdf"
         name="Insumar_Estadopagos.report_clientes"
         file="Insumar_Estadopagos.report_clientes"
-        paperformat="a4"
     />
 </odoo>
