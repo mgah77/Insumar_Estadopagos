@@ -24,6 +24,7 @@
                 <sheet>
                     <group>
                         <field name="sucursal" widget="radio" options="{'horizontal': true}"/>
+                        <field name="fecha_corte"/>
                     </group>
                     <footer>
                         <button name="generar_reporte" string="Imprimir Informe" type="object" class="btn-primary"/>

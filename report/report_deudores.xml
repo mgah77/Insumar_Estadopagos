@@ -4,7 +4,7 @@
             <t t-call="web.basic_layout">
                 <div class="header" >
                      <h5 style="text-align: center;">Estado pago sucursal <t t-esc="sucursal_nombre"/></h5>
-                    <p style="text-align: center; font-style: italic;">Fecha: <t t-esc="fecha_actual"/></p>
+                    <p style="text-align: center; font-style: italic;">Facturas con vencimiento hasta: <t t-esc="fecha_corte"/></p>
                 </div>
                 <div class="page" >                                       
                     <t t-foreach="clientes" t-as="cliente">

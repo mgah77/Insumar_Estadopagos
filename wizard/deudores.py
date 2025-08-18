@@ -11,6 +11,14 @@ class DeudoresWizard(models.TransientModel):
         ('5', 'Ñuble')
     ], string='Sucursal', required=True)
 
+       
+    fecha_corte = fields.Date(
+        string='Fecha de Corte para Vencimientos',
+        required=True,
+        default=fields.Date.context_today
+    )
+
+
     def generar_reporte(self):
         data = {
             'sucursal': self.sucursal,
@@ -23,6 +31,7 @@ class DeudoresWizard(models.TransientModel):
             ('team_id', '=', int(self.sucursal)),
             ('move_type', '=', 'in_invoice'),
             ('state', '=', 'posted'),
+            ('invoice_date_due', '<=', self.fecha_corte),
         ], order='partner_id')
         
         clientes = {}
