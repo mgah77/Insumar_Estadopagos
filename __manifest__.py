@@ -12,6 +12,8 @@
          'wizard/estado_wizard.xml',
         'wizard/deudores.xml',
         'report/report_deudores.xml',
+        'report/report_payment.xml'
+
 ],
 'depends': ['base' , 'contacts' , 'account', 'parches_insumar']
 }
