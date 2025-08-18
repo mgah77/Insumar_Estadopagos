@@ -1,7 +1,7 @@
 from odoo import api, models
 
 class ReportClientes(models.AbstractModel):
-    _name = "report.Insumar_Estadopagos.report_clientes"
+    _name = "report.insumar_estadopagos.report_clientes"
     _description = "Informe de Clientes (QWeb)"
 
     @api.model
