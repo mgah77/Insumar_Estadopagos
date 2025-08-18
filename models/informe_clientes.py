@@ -56,25 +56,25 @@ class InformeClientesWizard(models.TransientModel):
         self.ensure_one()
         domain = [
             ("move_type", "in", ["out_invoice", "out_refund"]),
-            ("state", "=", "posted"),
+            # ("state", "=", "posted"),
             ("partner_id", "=", self.partner_id.id),
         ]
 
         # Pendientes vs todas
-        if self.invoice_scope == "pending":
-            domain += [("amount_residual", ">", 0)]
+         #if self.invoice_scope == "pending":
+          #   domain += [("amount_residual", ">", 0)]
 
         # Fechas
-        if self.date_scope in ("current_year", "last_12"):
+         #if self.date_scope in ("current_year", "last_12"):
             # date_from / date_to ya seteados en onchange
-            if self.date_from:
-                domain += [("invoice_date", ">=", self.date_from)]
-            if self.date_to:
-                domain += [("invoice_date", "<=", self.date_to)]
-        elif self.date_scope == "range":
-            if self.date_from:
-                domain += [("invoice_date", ">=", self.date_from)]
-            if self.date_to:
+           #  if self.date_from:
+            #     domain += [("invoice_date", ">=", self.date_from)]
+             #if self.date_to:
+              #   domain += [("invoice_date", "<=", self.date_to)]
+         #elif self.date_scope == "range":
+          #   if self.date_from:
+            #     domain += [("invoice_date", ">=", self.date_from)]
+            # if self.date_to:
                 domain += [("invoice_date", "<=", self.date_to)]
 
         return domain
@@ -82,7 +82,7 @@ class InformeClientesWizard(models.TransientModel):
     def action_print_report(self):
         self.ensure_one()
         domain = self._compute_domain()
-        moves = self.env["account.move"].search(domain, order="invoice_date asc, name asc")
+        moves = self.env["account.move"].search(domain, order="invoice_date asc")
 
         data = {
             "partner_id": self.partner_id.id,
