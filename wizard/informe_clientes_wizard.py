@@ -36,6 +36,18 @@ class InformeClientesWizard(models.TransientModel):
 
     fecha_hasta = fields.Date(string='Hasta')
 
+    @api.onchange('rango_fechas')
+    def _onchange_rango_fechas(self):
+        today = fields.Date.context_today(self)
+        if self.rango_fechas == 'actual':
+            self.fecha_desde = datetime(today.year, 1, 1).date()
+            self.fecha_hasta = today
+        elif self.rango_fechas == 'anterior':
+            self.fecha_desde = today - relativedelta(months=24)
+            self.fecha_hasta = today
+        else:
+            self.fecha_desde = False
+            self.fecha_hasta = False
 
     def generar_reporte_cliente(self):
         data = {          

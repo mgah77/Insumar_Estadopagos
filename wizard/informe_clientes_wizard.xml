@@ -24,8 +24,11 @@
                 <sheet>
                     <group>
                         <field name="partner_id"/>                        
-                        <field name="fecha_desde"/>
-                        <field name="fecha_hasta"/>
+                        <field name="rango_fechas"/>
+                        <group attrs="{'invisible': [('rango_fechas', '!=', 'personalizado')]}">
+                            <field name="fecha_desde"/>
+                            <field name="fecha_hasta"/>
+                        </group>
                     </group>
                     <footer>
                         <button name="generar_reporte_cliente" string="Imprimir Informe" type="object" class="btn-primary"/>
