@@ -20,12 +20,10 @@ class InformeClientesWizard(models.TransientModel):
     ], string='Sucursal', required=True)
 
        
-    fecha_corte = fields.Date(
-        string='Fecha de Corte para Vencimientos',
-        required=True,
-        default=fields.Date.context_today
-    )
-
+    tipo_facturas = fields.Selection([
+        ('todas', 'Todas'),
+        ('impagas', 'Solo Impagas')
+    ], string='Estado Facturas', default='impagas', required=True)
         
     rango_fechas = fields.Selection([
         ('actual', 'Año en Curso'),
@@ -59,8 +57,7 @@ class InformeClientesWizard(models.TransientModel):
             'fecha_hasta': self.fecha_hasta.strftime('%d/%m/%Y'), 
         }
         
-        facturas_bruto = self.env['account.move'].search([
-            ('payment_state', 'in', ['not_paid', 'partial']),
+        facturas_bruto = self.env['account.move'].search([           
             ('move_type', 'in', ['out_invoice','out_refund']),
             ('state', '=', 'posted'),
             ('partner_id', '=', self.partner_id.id)
@@ -73,7 +70,20 @@ class InformeClientesWizard(models.TransientModel):
                 self.fecha_desde <= factura.invoice_date <= self.fecha_hasta):
                 ids_filtrados.append(factura.id)
 
-        facturas = self.env['account.move'].browse(ids_filtrados)
+        facturas_filtradas = self.env['account.move'].browse(ids_filtrados)
+
+        if self.tipo_facturas and self.tipo_facturas == 'todas':
+            continue
+        elif self.tipo_facturas and self.tipo_facturas == 'impagas':
+            # Crear segundo paso lista de IDs filtrados
+            ids_fechados = []
+            for factura in facturas_filtradas:
+                if (factura.payment_state and 
+                    factura.payment_state in ['not_paid', 'partial']):
+                    ids_fechados.append(factura.id)                    
+            facturas_filtradas = self.env['account.move'].browse(ids_fechados)
+            
+        facturas = facturas_filtradas
         
         clientes = {}
         for factura in facturas:
