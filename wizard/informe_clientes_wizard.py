@@ -58,7 +58,6 @@ class InformeClientesWizard(models.TransientModel):
         }
         
         facturas_bruto = self.env['account.move'].search([
-            ('payment_state', 'in', ['not_paid', 'partial']),
             ('move_type', 'in', ['out_invoice','out_refund']),
             ('state', '=', 'posted'),
             ('partner_id', '=', self.partner_id.id)
