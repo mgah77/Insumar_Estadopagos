@@ -73,16 +73,16 @@ class InformeClientesWizard(models.TransientModel):
 
         facturas_filtradas = self.env['account.move'].browse(ids_filtrados)
 
-        #if self.tipo_facturas and self.tipo_facturas == 'todas':
-        #    continue
-        #elif self.tipo_facturas and self.tipo_facturas == 'impagas':
+        if self.tipo_facturas and self.tipo_facturas == 'todas':
+            pass
+        elif self.tipo_facturas and self.tipo_facturas == 'impagas':
             # Crear segun do lista de IDs filtrados
-        #    ids_fechados = []
-        #    for factura in facturas_filtradas:
-        #        if (factura.payment_state and 
-        #            factura.payment_state in ['not_paid', 'partial']):
-        #            ids_fechados.append(factura.id)                    
-        #    facturas_filtradas = self.env['account.move'].browse(ids_fechados)
+            ids_fechados = []
+            for factura in facturas_filtradas:
+                if (factura.payment_state and 
+                    factura.payment_state in ['not_paid', 'partial']):
+                    ids_fechados.append(factura.id)                    
+            facturas_filtradas = self.env['account.move'].browse(ids_fechados)
             
         facturas = facturas_filtradas
         
