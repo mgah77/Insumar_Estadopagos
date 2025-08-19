@@ -37,11 +37,10 @@ class InformeClientesWizard(models.TransientModel):
         
         facturas = self.env['account.move'].search([
             ('payment_state', 'in', ['not_paid', 'partial']),
-            ('team_id', '=', int(self.sucursal)),
-            ('move_type', '=', 'out_invoice'),
+            ('move_type', 'in', ['out_invoice','out_refund']),
             ('state', '=', 'posted'),
-            ('invoice_date_due', '<=', self.fecha_corte),
-        ], order='partner_id')
+            ('partner_id', '=', self.partner_id)
+        ])
         
         clientes = {}
         for factura in facturas:

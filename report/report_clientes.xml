@@ -3,7 +3,7 @@
         <t t-call="web.html_container">
             <t t-call="web.basic_layout">
                 <div class="header" >
-                     <h5 style="text-align: center;">Estado pago Cliente:<t t-esc="partner_name"/></h5>
+                     <h5 style="text-align: center;">Estado pago Cliente: <t t-esc="partner_name"/></h5>
                     <p style="text-align: center; font-style: italic;">Facturas con vencimiento hasta: <t t-esc="fecha_corte"/></p>
                 </div>
                 <div class="page" >                                       
