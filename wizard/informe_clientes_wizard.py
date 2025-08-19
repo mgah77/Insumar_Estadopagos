@@ -27,8 +27,7 @@ class InformeClientesWizard(models.TransientModel):
 
 
     def generar_reporte_cliente(self):
-        data = {
-            'partner': self.partner_id,
+        data = {          
             'sucursal': self.sucursal,
             'sucursal_nombre': dict(self._fields['sucursal'].selection).get(self.sucursal),
             'fecha_actual': date.today().strftime('%d/%m/%Y'),
@@ -67,7 +66,7 @@ class InformeClientesWizard(models.TransientModel):
         clientes_ordenados = sorted(clientes.values(), key=lambda x: x['document_number'])
         data['clientes'] = clientes_ordenados
         
-        return self.env.ref('Insumar_Estadopagos.report_deudores').report_action(self, data=data)
+        return self.env.ref('Insumar_Estadopagos.action_report_clientes').report_action(self, data=data)
 
 
 class InformeClientesWizard2(models.TransientModel):
