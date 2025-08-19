@@ -23,9 +23,9 @@
             <form string="Generar Reporte de Estado de Pagos">
                 <sheet>
                     <group>
-                        <field name="partner_id"/>
-                        <field name="sucursal" widget="radio" options="{'horizontal': true}"/>
-                        <field name="fecha_corte"/>
+                        <field name="partner_id"/>                        
+                        <field name="fecha_desde"/>
+                        <field name="fecha_hasta"/>
                     </group>
                     <footer>
                         <button name="generar_reporte_cliente" string="Imprimir Informe" type="object" class="btn-primary"/>

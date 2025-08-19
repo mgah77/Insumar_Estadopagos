@@ -25,6 +25,16 @@ class InformeClientesWizard(models.TransientModel):
         default=fields.Date.context_today
     )
 
+        
+    rango_fechas = fields.Selection([
+        ('actual', 'Año en Curso'),
+        ('anterior', 'Últimos 12 Meses'),
+        ('personalizado', 'Rango Personalizado')
+    ], string='Rango de Fechas', default='actual', required=True)
+    
+    fecha_desde = fields.Date(string='Desde')
+    fecha_hasta = fields.Date(string='Hasta')
+
 
     def generar_reporte_cliente(self):
         data = {          
@@ -32,15 +42,24 @@ class InformeClientesWizard(models.TransientModel):
             'sucursal': self.sucursal,
             'sucursal_nombre': dict(self._fields['sucursal'].selection).get(self.sucursal),
             'fecha_actual': date.today().strftime('%d/%m/%Y'),
-            'fecha_corte': self.fecha_corte.strftime('%d/%m/%Y'), 
+            'fecha_corte': self.fecha_hasta.strftime('%d/%m/%Y'), 
         }
         
-        facturas = self.env['account.move'].search([
+        facturas_bruto = self.env['account.move'].search([
             ('payment_state', 'in', ['not_paid', 'partial']),
             ('move_type', 'in', ['out_invoice','out_refund']),
             ('state', '=', 'posted'),
             ('partner_id', '=', self.partner_id.id)
         ])
+
+        # Crear lista de IDs filtrados
+        ids_filtrados = []
+        for factura in facturas_bruto:
+            if (factura.invoice_date and 
+                fecha_desde <= factura.invoice_date <= fecha_hasta):
+                ids_filtrados.append(factura.id)
+
+        facturas = self.env['account.move'].browse(ids_filtrados)
         
         clientes = {}
         for factura in facturas:
