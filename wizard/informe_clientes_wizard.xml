@@ -24,7 +24,8 @@
                 <sheet>
                     <group>
                         <group>
-                        <field name="partner_id"/>                        
+                        <field name="partner_id"/>      
+                        <field name="tipo_facturas" widget="radio" options="{'horizontal': true}"/>                        
                         <field name="rango_fechas"/>
                         </group>
                         <group attrs="{'invisible': [('rango_fechas', '!=', 'personalizado')]}">
