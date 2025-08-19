@@ -26,7 +26,7 @@ class InformeClientesWizard(models.TransientModel):
     )
 
 
-    def generar_reporte(self):
+    def generar_reporte_cliente(self):
         data = {
             'partner': self.partner_id,
             'sucursal': self.sucursal,
