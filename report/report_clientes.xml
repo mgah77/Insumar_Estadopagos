@@ -14,7 +14,7 @@
                         
                         <table class="table table-bordered" style="width: 100%; margin-bottom: 15px;">
                             <thead>
-                                <tr>
+                                <tr style="font-size: 13px;">
                                     <th>Factura</th>
                                     <th>Fecha Emisión</th>
                                     <th>Fecha Vencimiento</th>
@@ -26,7 +26,7 @@
                             </thead>
                             <tbody>
                                 <t t-foreach="cliente['facturas']" t-as="factura">
-                                    <tr style="font-size: 11px;">
+                                    <tr style="font-size: 12px;">
                                         <td><t t-esc="factura['name']"/></td>
                                         <td><t t-esc="factura['invoice_date']"/></td>
                                         <td><t t-esc="factura['invoice_date_due']"/></td>
