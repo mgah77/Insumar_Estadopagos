@@ -1,6 +1,6 @@
 from odoo import models, fields, api
 from odoo.exceptions import UserError
-from datetime import date
+from datetime import date, datetime
 
 class InformeClientesWizard(models.TransientModel):
     _name = 'insumar.estadopagos.wizard'
