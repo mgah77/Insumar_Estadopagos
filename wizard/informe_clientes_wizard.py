@@ -90,6 +90,7 @@ class InformeClientesWizard(models.TransientModel):
                 'name': factura.sii_document_number,
                 'invoice_date': factura.invoice_date.strftime('%d/%m/%Y') if factura.invoice_date else '',
                 'invoice_date_due': factura.invoice_date_due.strftime('%d/%m/%Y') if factura.invoice_date_due else '',
+                'glosa': factura.glosa,
                 'amount_total': factura.amount_total,
                 'abono': abono,
                 'amount_residual': factura.amount_residual,
