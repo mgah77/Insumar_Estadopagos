@@ -26,7 +26,7 @@
                             </thead>
                             <tbody>
                                 <t t-foreach="cliente['facturas']" t-as="factura">
-                                    <tr>
+                                    <tr style="font-size: 11px;">
                                         <td><t t-esc="factura['name']"/></td>
                                         <td><t t-esc="factura['invoice_date']"/></td>
                                         <td><t t-esc="factura['invoice_date_due']"/></td>
