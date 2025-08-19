@@ -23,8 +23,10 @@
             <form string="Generar Reporte de Estado de Pagos">
                 <sheet>
                     <group>
-                        <field name="partner_id" label="Cliente"/>                        
-                        <field name="rango_fechas" label="Rango de fechas"/>
+                        <group>
+                        <field name="partner_id"/>                        
+                        <field name="rango_fechas"/>
+                        </group>
                         <group attrs="{'invisible': [('rango_fechas', '!=', 'personalizado')]}">
                             <field name="fecha_desde"/>
                             <field name="fecha_hasta"/>
