@@ -6,6 +6,12 @@ class InformeClientesWizard(models.TransientModel):
     _name = 'insumar.estadopagos.wizard'
     _description = 'Wizard para generar informe de estado de pagos'
 
+    partner_id = fields.Many2one(
+        'res.partner', 
+        string='Cliente',
+        domain=[('customer_rank', '>', 0)],
+        required=True
+    )
 
     sucursal = fields.Selection([
         ('1', 'Par Vial'),
@@ -22,6 +28,7 @@ class InformeClientesWizard(models.TransientModel):
 
     def generar_reporte(self):
         data = {
+            'partner': self.partner_id.id
             'sucursal': self.sucursal,
             'sucursal_nombre': dict(self._fields['sucursal'].selection).get(self.sucursal),
             'fecha_actual': date.today().strftime('%d/%m/%Y'),
