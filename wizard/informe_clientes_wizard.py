@@ -28,7 +28,7 @@ class InformeClientesWizard(models.TransientModel):
 
     def generar_reporte(self):
         data = {
-            'partner': self.partner_id.id
+            'partner': self.partner_id.id,
             'sucursal': self.sucursal,
             'sucursal_nombre': dict(self._fields['sucursal'].selection).get(self.sucursal),
             'fecha_actual': date.today().strftime('%d/%m/%Y'),
