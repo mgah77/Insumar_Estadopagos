@@ -39,7 +39,7 @@ class InformeClientesWizard(models.TransientModel):
             ('payment_state', 'in', ['not_paid', 'partial']),
             ('move_type', 'in', ['out_invoice','out_refund']),
             ('state', '=', 'posted'),
-            ('partner_id', '=', self.partner_id)
+            ('partner_id', '=', self.partner_id.id)
         ])
         
         clientes = {}
