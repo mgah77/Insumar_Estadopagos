@@ -44,7 +44,7 @@ class InformeClientesWizard(models.TransientModel):
             self.fecha_desde = datetime(today.year, 1, 1).date()
             self.fecha_hasta = today
         elif self.rango_fechas == 'anterior':
-            self.fecha_desde = today - relativedelta(months=24)
+            self.fecha_desde = today - relativedelta(months=12)
             self.fecha_hasta = today
         else:
             self.fecha_desde = False
@@ -55,8 +55,8 @@ class InformeClientesWizard(models.TransientModel):
             'partner_name': self.partner_id.name,
             'sucursal': self.sucursal,
             'sucursal_nombre': dict(self._fields['sucursal'].selection).get(self.sucursal),
-            'fecha_actual': date.today().strftime('%d/%m/%Y'),
-            'fecha_corte': self.fecha_hasta.strftime('%d/%m/%Y'), 
+            'fecha_desde': self.fecha_desde.strftime('%d/%m/%Y'), 
+            'fecha_hasta': self.fecha_hasta.strftime('%d/%m/%Y'), 
         }
         
         facturas_bruto = self.env['account.move'].search([
