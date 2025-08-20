@@ -10,7 +10,7 @@
 
     <menuitem 
         id="menu_estado_clientes" 
-        name="Informe de Clientes" 
+        name="Informe por Cliente" 
         parent="account.menu_finance_receivables"
         action="action_estado_clientes"
         groups="Insumar_Estadopagos.group_addon_estadopago"
