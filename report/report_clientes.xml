@@ -9,7 +9,7 @@
                                         alt="Company Logo"/>
                                 </div> 
                     </div>
-                     <div class="page" style="padding-bottom: 250px; padding-top: -30px;" >    
+                     <div class="page" style="padding-bottom: 250px; margin-top: -50px;" >    
                      <div>
                       <h5 style="text-align: center;">Estado pago Cliente: <t t-esc="partner_name"/></h5>
                     <p style="text-align: center; font-style: italic;">Facturas desde el <t t-esc="fecha_desde"/> hasta el <t t-esc="fecha_hasta"/></p>
