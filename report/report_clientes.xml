@@ -4,7 +4,7 @@
             <t t-call="web.basic_layout">
             <style>
                 .header{ position: relative; z-index: 1; padding-bottom: 0; margin-bottom: 0; background: transparent;}
-                .page{ position: relative; z-index: 2; margin-top: -50px; }
+                .page{ position: relative; z-index: 2; margin-top: -5px; }
             </style>
                  <div class="header">
                             <div style="top: 10px; left: 10px; width: 100px; height: auto;">
