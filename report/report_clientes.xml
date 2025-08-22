@@ -4,7 +4,6 @@
             <t t-call="web.basic_layout">
             <style>
                 .header{ position: relative; z-index: 1; padding-bottom: 0; margin-bottom: 0; background: transparent;}
-                .page{ position: relative; z-index: 2; margin-top: -5px; }
             </style>
                  <div class="header">
                             <div style="top: 10px; left: 10px; width: 100px; height: auto;">
@@ -50,6 +49,11 @@
                                 </t>
                             </tbody>
                         </table>
+                        <div class="footer" style="position: absolute; bottom: 0; left: 0; width: 100%; text-align: center; height: 0px;">
+                            <img t-att-src="'/Insumar_Estadopagos/static/src/img/footer.png'" 
+                                 style="width: 100%; height: auto;" 
+                                 alt="Footer Image"/>
+                        </div>
                     </t>
                 </div>
             </t>
