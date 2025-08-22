@@ -3,7 +3,7 @@
         <t t-call="web.html_container">
             <t t-call="web.basic_layout">
             <style>
-                .header{ position: relative; z-index: 1; padding-bottom: 0; margin-bottom: 0; }
+                .header{ position: relative; z-index: 1; padding-bottom: 0; margin-bottom: 0; background: transparent;}
                 .page{ position: relative; z-index: 2; margin-top: -50px; }
             </style>
                  <div class="header">
