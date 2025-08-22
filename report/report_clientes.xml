@@ -7,7 +7,7 @@
                 .page{ position: relative; z-index: 2; margin-top: -50px; }
             </style>
                  <div class="header">
-                            <div style="position: absolute; top: 10px; left: 10px; width: 100px; height: auto;">
+                            <div style="top: 10px; left: 10px; width: 100px; height: auto;">
                                     <img t-att-src="'/web/image/res.company/1/logo'" 
                                         style="width: 200px; height: auto;" 
                                         alt="Company Logo"/>
