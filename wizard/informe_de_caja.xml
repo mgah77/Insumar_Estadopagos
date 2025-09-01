@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
     <!-- Wizard: vista formulario -->
@@ -61,10 +61,7 @@
                 <div style="margin-bottom:12px;">
                     <span><strong>Fecha:</strong> <t t-esc="fecha"/></span>
                     <span style="margin-left:20px;"><strong>Selección:</strong>
-                        <!-- Forzar Ñ con entidad HTML cuando corresponde -->
-                        <t t-if="seleccion == 'nub'">&Ntilde;uble</t>
-                        <t t-elif="seleccion == 'par'">Par Vial</t>
-                        <t t-else=""><t t-esc="seleccion_name"/></t>
+                        <t t-esc="seleccion_name"/>
                     </span>
                 </div>
 
