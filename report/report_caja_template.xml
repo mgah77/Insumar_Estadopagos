@@ -2,7 +2,7 @@
 <odoo>
     <!-- t-name DEBE ser exactamente Insumar_Estadopagos.report_caja -->
     <template id="report_caja_template">
-        <t t-name="Insumar_Estadopagos.report_caja">
+        <t t-name="insumar_estadopagos.report_caja">
             <t t-call="web.external_layout">
                 <div class="page">
                     <h2 style="margin-bottom: 8px;">Informe de caja diario</h2>
@@ -73,8 +73,8 @@
         model="informe.de.caja.wizard"
         string="Informe de caja diario"
         report_type="qweb-pdf"
-        name="Insumar_Estadopagos.report_caja"
-        file="Insumar_Estadopagos.report_caja"
+        name="insumar_estadopagos.report_caja"
+        file="insumar_estadopagos.report_caja"
         print_report_name="'Informe_de_caja_diario_' + (object.fecha or '')"
     />
 

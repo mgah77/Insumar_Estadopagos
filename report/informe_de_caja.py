@@ -10,7 +10,7 @@ JOURNAL_NUB_ID = 14
 
 
 class ReportCaja(models.AbstractModel):
-    _name = "report.Insumar_Estadopagos.report_caja"
+    _name = "report.insumar_estadopagos.report_caja"
     _description = "Reporte QWeb - Informe de caja diario"
 
     def _normalize(self, s):
