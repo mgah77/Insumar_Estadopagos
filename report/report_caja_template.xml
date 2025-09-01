@@ -1,17 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <!-- t-name DEBE ser exactamente Insumar_Estadopagos.report_caja -->
-    <template id="report_caja_template">
+      <template id="report_caja_template">
         <t t-name="insumar_estadopagos.report_caja">
             <t t-call="web.external_layout">
                 <div class="page">
                     <h2 style="margin-bottom: 8px;">Informe de caja diario</h2>
                     <p>
-                        <strong>Fecha:</strong>
-                        <t t-esc="fecha"/>
-                        &nbsp; | &nbsp;
-                        <strong>Categoría:</strong>
-                        <t t-esc="categoria_label"/>
+                        <strong>Fecha:</strong> <t t-esc="fecha"/>&#160;|&#160;<strong>Categoría:</strong> <t t-esc="categoria_label"/>
                     </p>
 
                     <table class="table table-sm o_main_table" style="width:100%; border-collapse: collapse;">
@@ -30,7 +26,6 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <!-- Facturas -->
                             <t t-foreach="fact_lines" t-as="l">
                                 <tr>
                                     <td><t t-esc="l['sequence_prefix']"/></td>
@@ -46,7 +41,6 @@
                                 </tr>
                             </t>
 
-                            <!-- Notas de crédito (al final) -->
                             <t t-foreach="refund_lines" t-as="l">
                                 <tr>
                                     <td><t t-esc="l['sequence_prefix']"/></td>
@@ -67,7 +61,7 @@
             </t>
         </t>
     </template>
-
+    
         <report
         id="report_caja"
         model="informe.de.caja.wizard"
