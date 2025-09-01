@@ -50,16 +50,22 @@
     <!-- Template QWeb -->
     <template id="informe_de_caja">
         <t t-call="web.html_container">
-            <!-- Recibe las claves de data en el contexto superior -->
+            <!-- Variables del contexto -->
             <t t-set="rows" t-value="rows or []"/>
             <t t-set="fecha" t-value="date"/>
+            <t t-set="seleccion" t-value="seleccion"/>
             <t t-set="seleccion_name" t-value="seleccion_name"/>
 
             <div class="page">
                 <h2 style="margin-bottom:8px;">Informe de caja</h2>
                 <div style="margin-bottom:12px;">
                     <span><strong>Fecha:</strong> <t t-esc="fecha"/></span>
-                    <span style="margin-left:20px;"><strong>Selección:</strong> <t t-esc="seleccion_name"/></span>
+                    <span style="margin-left:20px;"><strong>Selección:</strong>
+                        <!-- Forzar Ñ con entidad HTML cuando corresponde -->
+                        <t t-if="seleccion == 'nub'">&Ntilde;uble</t>
+                        <t t-elif="seleccion == 'par'">Par Vial</t>
+                        <t t-else=""><t t-esc="seleccion_name"/></t>
+                    </span>
                 </div>
 
                 <table class="table table-sm o_main_table" style="width:100%; border-collapse:collapse;" border="1">
@@ -82,12 +88,15 @@
                             <td><t t-esc="r.get('sequence_prefix')"/></td>
                             <td><t t-esc="r.get('sequence_number')"/></td>
                             <td><t t-esc="r.get('date_invoice')"/></td>
-                            <td class="text-right"><t t-esc="('%.2f' % (r.get('amount_total') or 0.0))"/></td>
-                            <td class="text-right"><t t-esc="('%.2f' % (r.get('efectivo') or 0.0))"/></td>
-                            <td class="text-right"><t t-esc="('%.2f' % (r.get('debito_tarjeta') or 0.0))"/></td>
-                            <td class="text-right"><t t-esc="('%.2f' % (r.get('transferencia_deposito') or 0.0))"/></td>
-                            <td class="text-right"><t t-esc="('%.2f' % (r.get('cheque') or 0.0))"/></td>
-                            <td class="text-right"><t t-esc="('%.2f' % (r.get('credito') or 0.0))"/></td>
+
+                            <!-- SIN DECIMALES -->
+                            <td class="text-right"><t t-esc="('%.0f' % (r.get('amount_total') or 0.0))"/></td>
+                            <td class="text-right"><t t-esc="('%.0f' % (r.get('efectivo') or 0.0))"/></td>
+                            <td class="text-right"><t t-esc="('%.0f' % (r.get('debito_tarjeta') or 0.0))"/></td>
+                            <td class="text-right"><t t-esc="('%.0f' % (r.get('transferencia_deposito') or 0.0))"/></td>
+                            <td class="text-right"><t t-esc="('%.0f' % (r.get('cheque') or 0.0))"/></td>
+                            <td class="text-right"><t t-esc="('%.0f' % (r.get('credito') or 0.0))"/></td>
+
                             <td><t t-esc="r.get('document_number')"/></td>
                         </tr>
                     </tbody>

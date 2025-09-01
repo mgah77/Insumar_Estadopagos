@@ -91,11 +91,11 @@ class InformeDeCajaWizard(models.TransientModel):
             if not invoice:
                 continue
 
-            # FILTRO por team (sucursal) en la propia factura
+            # FILTRO por team (sucursal) en la factura
             if 'team_id' in invoice._fields and selected_team_id and (invoice.team_id.id != selected_team_id):
                 continue
 
-            # Monto tomado directamente de account.payment (según solicitud)
+            # Monto tomado directamente de account.payment (sin decimales en PDF)
             paid_amount = abs(payment.amount or 0.0)
             if paid_amount <= 0.0:
                 continue
@@ -116,7 +116,6 @@ class InformeDeCajaWizard(models.TransientModel):
             ('invoice_date', '=', date_val),
             ('state', '=', 'posted'),
         ]
-        # FILTRO por team (sucursal)
         if selected_team_id and 'team_id' in self.env['account.move']._fields:
             unpaid_domain.append(('team_id', '=', selected_team_id))
 
@@ -148,12 +147,17 @@ class InformeDeCajaWizard(models.TransientModel):
         refunds = self.env['account.move'].search(refund_domain)
         for rf in refunds:
             rf_row = self._empty_row_from_invoice(rf)
-            # Agrupa NC junto a Transferencia/Depósito
-            rf_row['transferencia_deposito'] += abs(rf.amount_total or 0.0)
+            # NC deben ir NEGATIVAS en la columna agrupada
+            rf_row['transferencia_deposito'] += -abs(rf.amount_total or 0.0)
             refund_rows.append(rf_row)
 
-        seleccion_name = 'Par Vial' if seleccion == 'par' else 'Ñuble'
-        return {'date': date_val, 'seleccion_name': seleccion_name, 'rows': rows + refund_rows}
+        # Pasamos también la clave técnica de selección para el template (Ñ)
+        return {
+            'date': date_val,
+            'seleccion': seleccion,  # 'par' o 'nub'
+            'seleccion_name': 'Par Vial' if seleccion == 'par' else 'Ñuble',
+            'rows': rows + refund_rows,
+        }
 
     # Helpers
     def _empty_row_from_invoice(self, inv):
