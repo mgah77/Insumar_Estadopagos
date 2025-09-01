@@ -10,8 +10,7 @@
                 <group>
                     <field name="date"/>
                     <field name="user_id" readonly="1"/>
-                    <field name="categoria"
-                           attrs="{'readonly':[('is_adm','=',False)]}"/>
+                    <field name="categoria" attrs="{'readonly':[('is_adm','=',False)]}"/>
                     <field name="is_adm" invisible="1"/>
                 </group>
                 <footer>
@@ -51,9 +50,10 @@
     <!-- Template QWeb -->
     <template id="informe_de_caja">
         <t t-call="web.html_container">
-            <t t-set="rows" t-value="data.get('rows', [])"/>
-            <t t-set="fecha" t-value="data.get('date')"/>
-            <t t-set="seleccion_name" t-value="data.get('seleccion_name')"/>
+            <!-- Recibe las claves de data en el contexto superior -->
+            <t t-set="rows" t-value="rows or []"/>
+            <t t-set="fecha" t-value="date"/>
+            <t t-set="seleccion_name" t-value="seleccion_name"/>
 
             <div class="page">
                 <h2 style="margin-bottom:8px;">Informe de caja</h2>

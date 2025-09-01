@@ -17,6 +17,9 @@ class InformeDeCajaWizard(models.TransientModel):
     ], string='Selección', required=True, default=lambda self: self._default_categoria())
     is_adm = fields.Boolean(string='Es Administrador', compute='_compute_is_adm', store=False)
 
+    # -------------------------------------------------
+    # Defaults / Computes
+    # -------------------------------------------------
     @api.model
     def _default_categoria(self):
         user = self.env.user
@@ -38,26 +41,39 @@ class InformeDeCajaWizard(models.TransientModel):
             is_nub = bool(nub_team) and (user in nub_team.member_ids)
             rec.is_adm = not (is_par or is_nub)
 
+    # -------------------------------------------------
+    # Actions
+    # -------------------------------------------------
     def action_print(self):
         self.ensure_one()
         if self.categoria == 'adm':
             raise UserError(_('Seleccione Par Vial o Ñuble antes de imprimir.'))
         data = self._build_report_data()
-        # data se pasa igual; el parser (abajo) lo inyecta al template
         return self.env.ref('Insumar_Estadopagos.report_caja').report_action(self, data=data)
 
+    # -------------------------------------------------
+    # Report data
+    # -------------------------------------------------
     def _build_report_data(self):
         self.ensure_one()
         date_val = self.date
         seleccion = self.categoria
-        journal_map = {'par': 12, 'nub': 14}
+
+        # Journals por selección
+        journal_map = {
+            'par': 12,  # Par Vial
+            'nub': 14,  # Ñuble
+        }
         journal_id = journal_map.get(seleccion)
         if not journal_id:
             raise UserError(_('No se encontró journal para la selección.'))
 
+        # Payment Method Lines del journal
         pml_ids = self.env['account.payment.method.line'].search([('journal_id', '=', journal_id)]).ids
+
         rows_by_invoice = {}
 
+        # 1) Asientos de pago del día (entry) del journal seleccionado
         entries = self.env['account.move'].search([
             ('move_type', '=', 'entry'),
             ('date', '=', date_val),
@@ -74,6 +90,8 @@ class InformeDeCajaWizard(models.TransientModel):
                 continue
 
             method_name = (payment.payment_method_line_id.name or '').strip()
+
+            # Buscar factura por referencia: ref del entry == name de la factura (out_invoice)
             invoice = self.env['account.move'].search([
                 ('move_type', '=', 'out_invoice'),
                 ('name', '=', entry.ref or ''),
@@ -81,17 +99,24 @@ class InformeDeCajaWizard(models.TransientModel):
             if not invoice:
                 continue
 
-            # Tomar monto desde account.payment (según tu solicitud)
+            # Monto tomado directamente de account.payment (según solicitud)
             paid_amount = abs(payment.amount or 0.0)
             if paid_amount <= 0.0:
                 continue
 
-            inv_row = rows_by_invoice.get(invoice.id) or self._empty_row_from_invoice(invoice)
+            inv_row = rows_by_invoice.get(invoice.id)
+            if not inv_row:
+                inv_row = self._empty_row_from_invoice(invoice)
+
+            # Sumar en columna por método
             col_key = self._method_to_column(method_name)
             inv_row[col_key] += paid_amount
+
+            # Crédito = saldo
             inv_row['credito'] = max((invoice.amount_total or 0.0) - self._accum_paid(inv_row), 0.0)
             rows_by_invoice[invoice.id] = inv_row
 
+        # 2) Facturas del día (sin pagos o con parcial) → crédito/residual
         unpaid_invoices = self.env['account.move'].search([
             ('move_type', '=', 'out_invoice'),
             ('invoice_date', '=', date_val),
@@ -102,14 +127,17 @@ class InformeDeCajaWizard(models.TransientModel):
             residual = max(inv.amount_residual or 0.0, 0.0)
             if inv_row:
                 inv_row['credito'] = max(residual, 0.0)
+                rows_by_invoice[inv.id] = inv_row
             else:
                 inv_row = self._empty_row_from_invoice(inv)
                 inv_row['credito'] = residual if residual > 0.0 else (inv.amount_total or 0.0)
-            rows_by_invoice[inv.id] = inv_row
+                rows_by_invoice[inv.id] = inv_row
 
+        # Orden: fecha desc
         rows = list(rows_by_invoice.values())
         rows.sort(key=lambda r: r.get('date_invoice') or pydate(1970, 1, 1), reverse=True)
 
+        # 3) Notas de crédito del día al final (out_refund)
         refund_rows = []
         refunds = self.env['account.move'].search([
             ('move_type', '=', 'out_refund'),
@@ -118,12 +146,20 @@ class InformeDeCajaWizard(models.TransientModel):
         ])
         for rf in refunds:
             rf_row = self._empty_row_from_invoice(rf)
+            # Transferencia/Depósito/NC en una sola columna
             rf_row['transferencia_deposito'] += abs(rf.amount_total or 0.0)
             refund_rows.append(rf_row)
 
         seleccion_name = 'Par Vial' if seleccion == 'par' else 'Ñuble'
-        return {'date': date_val, 'seleccion_name': seleccion_name, 'rows': rows + refund_rows}
+        return {
+            'date': date_val,
+            'seleccion_name': seleccion_name,
+            'rows': rows + refund_rows,
+        }
 
+    # -------------------------------------------------
+    # Helpers
+    # -------------------------------------------------
     def _empty_row_from_invoice(self, inv):
         partner = inv.partner_id
         return {
@@ -133,7 +169,7 @@ class InformeDeCajaWizard(models.TransientModel):
             'amount_total': inv.amount_total or 0.0,
             'efectivo': 0.0,
             'debito_tarjeta': 0.0,
-            'transferencia_deposito': 0.0,
+            'transferencia_deposito': 0.0,  # agrupa transferencia/depósito/NC
             'cheque': 0.0,
             'credito': 0.0,
             'document_number': getattr(partner, 'document_number', '') or '',
@@ -158,22 +194,3 @@ class InformeDeCajaWizard(models.TransientModel):
             + row.get('transferencia_deposito', 0.0)
             + row.get('cheque', 0.0)
         )
-
-
-# Parser del reporte: inyecta 'data' al template QWeb
-class ReportInformeDeCaja(models.AbstractModel):
-    _name = 'report.Insumar_Estadopagos.informe_de_caja'
-    _description = 'Parser Informe de Caja Diario'
-
-    @api.model
-    def _get_report_values(self, docids, data=None):
-        docs = self.env['informe_de_caja_wizard'].browse(docids)
-        # Si por alguna razón 'data' viene vacío, lo reconstruimos
-        if not data and docs:
-            data = docs._build_report_data()
-        return {
-            'doc_ids': docs.ids,
-            'doc_model': 'informe_de_caja_wizard',
-            'docs': docs,
-            'data': data or {},
-        }
