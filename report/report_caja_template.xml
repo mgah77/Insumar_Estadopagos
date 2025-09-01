@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- t-name DEBE ser exactamente Insumar_Estadopagos.report_caja -->
+    <template id="report_caja_template">
+        <t t-name="Insumar_Estadopagos.report_caja">
+            <t t-call="web.external_layout">
+                <div class="page">
+                    <h2 style="margin-bottom: 8px;">Informe de caja diario</h2>
+                    <p>
+                        <strong>Fecha:</strong>
+                        <t t-esc="fecha"/>
+                        &nbsp; | &nbsp;
+                        <strong>Categoría:</strong>
+                        <t t-esc="categoria_label"/>
+                    </p>
+
+                    <table class="table table-sm o_main_table" style="width:100%; border-collapse: collapse;">
+                        <thead>
+                            <tr>
+                                <th>Prefijo</th>
+                                <th>Número</th>
+                                <th>Fecha</th>
+                                <th>Total</th>
+                                <th>Efectivo</th>
+                                <th>Débito/Tarjeta</th>
+                                <th>Transferencia/Depósito/NC</th>
+                                <th>Cheque</th>
+                                <th>Crédito</th>
+                                <th>RUT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Facturas -->
+                            <t t-foreach="fact_lines" t-as="l">
+                                <tr>
+                                    <td><t t-esc="l['sequence_prefix']"/></td>
+                                    <td><t t-esc="l['sequence_number']"/></td>
+                                    <td><t t-esc="l['date_invoice']"/></td>
+                                    <td class="text-right"><t t-esc="l['amount_total']"/></td>
+                                    <td class="text-right"><t t-esc="l['efectivo']"/></td>
+                                    <td class="text-right"><t t-esc="l['debito_tarjeta']"/></td>
+                                    <td class="text-right"><t t-esc="l['transf_deposito_nc']"/></td>
+                                    <td class="text-right"><t t-esc="l['cheque']"/></td>
+                                    <td class="text-right"><t t-esc="l['credito']"/></td>
+                                    <td><t t-esc="l['partner_document']"/></td>
+                                </tr>
+                            </t>
+
+                            <!-- Notas de crédito (al final) -->
+                            <t t-foreach="refund_lines" t-as="l">
+                                <tr>
+                                    <td><t t-esc="l['sequence_prefix']"/></td>
+                                    <td><t t-esc="l['sequence_number']"/></td>
+                                    <td><t t-esc="l['date_invoice']"/></td>
+                                    <td class="text-right"><t t-esc="l['amount_total']"/></td>
+                                    <td class="text-right">0.0</td>
+                                    <td class="text-right">0.0</td>
+                                    <td class="text-right"><t t-esc="l['transf_deposito_nc']"/></td>
+                                    <td class="text-right">0.0</td>
+                                    <td class="text-right">0.0</td>
+                                    <td><t t-esc="l['partner_document']"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                </div>
+            </t>
+        </t>
+    </template>
+
+        <report
+        id="report_caja"
+        model="informe.de.caja.wizard"
+        string="Informe de caja diario"
+        report_type="qweb-pdf"
+        name="Insumar_Estadopagos.report_caja"
+        file="Insumar_Estadopagos.report_caja"
+        print_report_name="'Informe_de_caja_diario_' + (object.fecha or '')"
+    />
+
+</odoo>
