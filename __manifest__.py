@@ -13,10 +13,9 @@
         'wizard/deudores.xml',        
         'report/report_deudores.xml',
         'report/report_payment.xml',        
-        'report/report_clientes.xml',
-        'report/report_caja_template.xml',        
+        'report/report_clientes.xml',      
         "wizard/informe_clientes_wizard.xml",
-        'wizard/informe_de_caja_view.xml'
+        'wizard/informe_de_caja.xml'
        
 ],
 'depends': ['base' , 'contacts' , 'account', 'parches_insumar']

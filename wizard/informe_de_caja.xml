@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- Wizard: vista formulario -->
+    <record id="view_informe_de_caja_wizard_form" model="ir.ui.view">
+        <field name="name">informe.de.caja.wizard.form</field>
+        <field name="model">informe_de_caja_wizard</field>
+        <field name="arch" type="xml">
+            <form string="Informe de caja diario">
+                <group>
+                    <field name="date"/>
+                    <field name="user_id" readonly="1"/>
+                    <field name="categoria"
+                           attrs="{'readonly':[('is_adm','=',False)]}"/>
+                    <field name="is_adm" invisible="1"/>
+                </group>
+                <footer>
+                    <button name="action_print" type="object" string="Imprimir informe" class="btn-primary"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <!-- Acción de ventana del wizard -->
+    <record id="action_informe_de_caja_wizard" model="ir.actions.act_window">
+        <field name="name">Informe de caja diario</field>
+        <field name="res_model">informe_de_caja_wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="view_informe_de_caja_wizard_form"/>
+    </record>
+
+    <!-- Menú bajo Facturación ▸ Clientes -->
+    <menuitem id="menu_informe_de_caja_wizard"
+              name="Informe de caja diario"
+              parent="account.menu_finance_receivables"
+              action="action_informe_de_caja_wizard"
+              sequence="95"/>
+
+    <!-- Acción de reporte -->
+    <record id="report_caja" model="ir.actions.report">
+        <field name="name">Informe de caja</field>
+        <field name="model">informe_de_caja_wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">Insumar_Estadopagos.informe_de_caja</field>
+        <field name="report_file">Insumar_Estadopagos.informe_de_caja</field>
+        <field name="print_report_name">'informe_caja_' + (object.date and object.date.strftime('%Y%m%d') or '')</field>
+    </record>
+
+    <!-- Template QWeb -->
+    <template id="informe_de_caja">
+        <t t-call="web.html_container">
+            <t t-set="rows" t-value="data.get('rows', [])"/>
+            <t t-set="fecha" t-value="data.get('date')"/>
+            <t t-set="seleccion_name" t-value="data.get('seleccion_name')"/>
+
+            <div class="page">
+                <h2 style="margin-bottom:8px;">Informe de caja</h2>
+                <div style="margin-bottom:12px;">
+                    <span><strong>Fecha:</strong> <t t-esc="fecha"/></span>
+                    <span style="margin-left:20px;"><strong>Selección:</strong> <t t-esc="seleccion_name"/></span>
+                </div>
+
+                <table class="table table-sm o_main_table" style="width:100%; border-collapse:collapse;" border="1">
+                    <thead>
+                        <tr>
+                            <th>Prefijo</th>
+                            <th>Número</th>
+                            <th>Fecha Factura</th>
+                            <th>Total</th>
+                            <th>Efectivo</th>
+                            <th>Débito / T. Crédito</th>
+                            <th>Transf. / Depósito / NC</th>
+                            <th>Cheque</th>
+                            <th>Crédito</th>
+                            <th>RUT</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr t-foreach="rows" t-as="r">
+                            <td><t t-esc="r.get('sequence_prefix')"/></td>
+                            <td><t t-esc="r.get('sequence_number')"/></td>
+                            <td><t t-esc="r.get('date_invoice')"/></td>
+                            <td class="text-right"><t t-esc="('%.2f' % (r.get('amount_total') or 0.0))"/></td>
+                            <td class="text-right"><t t-esc="('%.2f' % (r.get('efectivo') or 0.0))"/></td>
+                            <td class="text-right"><t t-esc="('%.2f' % (r.get('debito_tarjeta') or 0.0))"/></td>
+                            <td class="text-right"><t t-esc="('%.2f' % (r.get('transferencia_deposito') or 0.0))"/></td>
+                            <td class="text-right"><t t-esc="('%.2f' % (r.get('cheque') or 0.0))"/></td>
+                            <td class="text-right"><t t-esc="('%.2f' % (r.get('credito') or 0.0))"/></td>
+                            <td><t t-esc="r.get('document_number')"/></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </t>
+    </template>
+
+</odoo>
