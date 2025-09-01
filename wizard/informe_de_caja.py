@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from datetime import date as pydate
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
@@ -14,7 +15,6 @@ class InformeDeCajaWizard(models.TransientModel):
         ('par', 'Par Vial'),
         ('nub', 'Ñuble'),
     ], string='Selección', required=True, default=lambda self: self._default_categoria())
-    # Admin según pertenencia a equipos CRM (NO según la selección actual)
     is_adm = fields.Boolean(string='Es Administrador', compute='_compute_is_adm', store=False)
 
     # -------------------------------------------------
@@ -46,7 +46,6 @@ class InformeDeCajaWizard(models.TransientModel):
     # -------------------------------------------------
     def action_print(self):
         self.ensure_one()
-        # Para admin se exige escoger sucursal (par/nub) antes de imprimir
         if self.categoria == 'adm':
             raise UserError(_('Seleccione Par Vial o Ñuble antes de imprimir.'))
         data = self._build_report_data()
@@ -57,7 +56,7 @@ class InformeDeCajaWizard(models.TransientModel):
     # -------------------------------------------------
     def _build_report_data(self):
         self.ensure_one()
-        date = self.date
+        date_val = self.date
         seleccion = self.categoria
 
         # Journals por selección
@@ -77,7 +76,7 @@ class InformeDeCajaWizard(models.TransientModel):
         # 1) Asientos de pago del día (entry) del journal seleccionado
         entries = self.env['account.move'].search([
             ('move_type', '=', 'entry'),
-            ('date', '=', date),
+            ('date', '=', date_val),
             ('journal_id', '=', journal_id),
             ('payment_id', '!=', False),
             ('state', '=', 'posted'),
@@ -100,7 +99,8 @@ class InformeDeCajaWizard(models.TransientModel):
             if not invoice:
                 continue
 
-            paid_amount = self._compute_paid_amount_for_invoice_with_payment(invoice, payment)
+            # TOMA EL MONTO DESDE account.payment (según lo solicitado)
+            paid_amount = abs(payment.amount or 0.0)
             if paid_amount <= 0.0:
                 continue
 
@@ -119,7 +119,7 @@ class InformeDeCajaWizard(models.TransientModel):
         # 2) Facturas del día (sin pagos o con parcial) → crédito/residual
         unpaid_invoices = self.env['account.move'].search([
             ('move_type', '=', 'out_invoice'),
-            ('invoice_date', '=', date),
+            ('invoice_date', '=', date_val),
             ('state', '=', 'posted'),
         ])
         for inv in unpaid_invoices:
@@ -133,15 +133,15 @@ class InformeDeCajaWizard(models.TransientModel):
                 inv_row['credito'] = residual if residual > 0.0 else (inv.amount_total or 0.0)
                 rows_by_invoice[inv.id] = inv_row
 
-        #  Orden: fecha desc
+        # Orden: fecha desc
         rows = list(rows_by_invoice.values())
-        rows.sort(key=lambda r: r.get('date_invoice') or fields.Date.from_string('1970-01-01'), reverse=True)
+        rows.sort(key=lambda r: r.get('date_invoice') or pydate(1970, 1, 1), reverse=True)
 
         # 3) Notas de crédito del día al final
         refund_rows = []
         refunds = self.env['account.move'].search([
             ('move_type', '=', 'out_refund'),
-            ('invoice_date', '=', date),
+            ('invoice_date', '=', date_val),
             ('state', '=', 'posted'),
         ])
         for rf in refunds:
@@ -152,7 +152,7 @@ class InformeDeCajaWizard(models.TransientModel):
 
         seleccion_name = 'Par Vial' if seleccion == 'par' else 'Ñuble'
         return {
-            'date': date,
+            'date': date_val,
             'seleccion_name': seleccion_name,
             'rows': rows + refund_rows,
         }
@@ -194,17 +194,3 @@ class InformeDeCajaWizard(models.TransientModel):
             + row.get('transferencia_deposito', 0.0)
             + row.get('cheque', 0.0)
         )
-
-    def _compute_paid_amount_for_invoice_with_payment(self, invoice, payment):
-        """Suma conciliaciones parciales entre líneas de factura y del pago."""
-        amount = 0.0
-        inv_lines = invoice.line_ids.filtered(lambda l: l.account_id.internal_type in ('receivable', 'payable'))
-        pay_lines = payment.move_id.line_ids.filtered(lambda l: l.account_id.internal_type in ('receivable', 'payable'))
-        pay_lines_set = set(pay_lines.ids)
-
-        for line in inv_lines:
-            for pr in (line.matched_debit_ids | line.matched_credit_ids):
-                c_line = pr.debit_move_id if pr.credit_move_id.id == line.id else pr.credit_move_id
-                if c_line.id in pay_lines_set:
-                    amount += pr.amount
-        return amount
