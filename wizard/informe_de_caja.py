@@ -17,9 +17,6 @@ class InformeDeCajaWizard(models.TransientModel):
     ], string='Selección', required=True, default=lambda self: self._default_categoria())
     is_adm = fields.Boolean(string='Es Administrador', compute='_compute_is_adm', store=False)
 
-    # -------------------------------------------------
-    # Defaults / Computes
-    # -------------------------------------------------
     @api.model
     def _default_categoria(self):
         user = self.env.user
@@ -41,52 +38,53 @@ class InformeDeCajaWizard(models.TransientModel):
             is_nub = bool(nub_team) and (user in nub_team.member_ids)
             rec.is_adm = not (is_par or is_nub)
 
-    # -------------------------------------------------
-    # Actions
-    # -------------------------------------------------
     def action_print(self):
         self.ensure_one()
-        if self.categoria == 'adm':
-            raise UserError(_('Seleccione Par Vial o Ñuble antes de imprimir.'))
+        # Ahora 'adm' sí imprime (con su propia lógica)
         data = self._build_report_data()
         return self.env.ref('Insumar_Estadopagos.report_caja').report_action(self, data=data)
 
-    # -------------------------------------------------
-    # Report data
-    # -------------------------------------------------
     def _build_report_data(self):
         self.ensure_one()
         date_val = self.date
         seleccion = self.categoria
 
-        # Journals por selección
-        journal_map = {'par': 12, 'nub': 14}
-        journal_id = journal_map.get(seleccion)
-        if not journal_id:
-            raise UserError(_('No se encontró journal para la selección.'))
+        # Diarios por selección
+        if seleccion == 'par':
+            journal_ids = [12]
+        elif seleccion == 'nub':
+            journal_ids = [14]
+        else:  # adm: ambos diarios
+            journal_ids = [12, 14]
 
-        # Teams por selección (para validar membresía del vendedor de la factura)
-        team_map = {'par': 1, 'nub': 5}
-        selected_team_id = team_map.get(seleccion)
-        selected_team = self.env['crm.team'].browse(selected_team_id) if selected_team_id else self.env['crm.team']
+        # Teams de sucursales (para validar vendedor)
+        team_par = self.env['crm.team'].browse(1)
+        team_nub = self.env['crm.team'].browse(5)
 
-        # Payment Method Lines del journal
-        pml_ids = self.env['account.payment.method.line'].search([('journal_id', '=', journal_id)]).ids
+        # Función: ¿el vendedor (invoice_user_id) calza con la selección?
+        def seller_matches_selection(inv):
+            if 'invoice_user_id' not in inv._fields:
+                return False
+            seller = inv.invoice_user_id
+            in_par = bool(team_par) and seller and (seller in team_par.member_ids)
+            in_nub = bool(team_nub) and seller and (seller in team_nub.member_ids)
+            if seleccion == 'par':
+                return in_par
+            if seleccion == 'nub':
+                return in_nub
+            # adm: no debe pertenecer a ninguno de los 2 teams; si no hay seller, lo consideramos "adm"
+            return not in_par and not in_nub
+
+        # Payment Method Lines de los diarios seleccionados
+        pml_ids = self.env['account.payment.method.line'].search([('journal_id', 'in', journal_ids)]).ids
 
         rows_by_invoice = {}
 
-        # Helper para validar membresía del vendedor al team elegido
-        def seller_belongs_to_selected_team(inv):
-            if 'invoice_user_id' not in inv._fields:
-                return False
-            user = inv.invoice_user_id
-            return bool(user) and bool(selected_team) and (user in selected_team.member_ids)
-
-        # 1) Asientos de pago (entry) del día para ese journal
+        # 1) Asientos de pago (entry) del día para los diarios seleccionados
         entries = self.env['account.move'].search([
             ('move_type', '=', 'entry'),
             ('date', '=', date_val),
-            ('journal_id', '=', journal_id),
+            ('journal_id', 'in', journal_ids),
             ('payment_id', '!=', False),
             ('state', '=', 'posted'),
         ])
@@ -100,7 +98,7 @@ class InformeDeCajaWizard(models.TransientModel):
 
             method_name = (payment.payment_method_line_id.name or '').strip()
 
-            # Factura: name == ref del asiento
+            # Vincular factura: name == ref del asiento
             invoice = self.env['account.move'].search([
                 ('move_type', '=', 'out_invoice'),
                 ('name', '=', entry.ref or ''),
@@ -108,18 +106,18 @@ class InformeDeCajaWizard(models.TransientModel):
             if not invoice:
                 continue
 
-            # >>> Nuevo filtro: vendedor de la factura debe pertenecer al team seleccionado
-            if not seller_belongs_to_selected_team(invoice):
+            # Nuevo criterio: vendedor debe calzar con la selección
+            if not seller_matches_selection(invoice):
                 continue
 
-            # Monto tomado directamente de account.payment
+            # Monto del pago (directo desde account.payment)
             paid_amount = abs(payment.amount or 0.0)
             if paid_amount <= 0.0:
                 continue
 
             inv_row = rows_by_invoice.get(invoice.id) or self._empty_row_from_invoice(invoice)
 
-            # Columna según método
+            # Sumar en columna por método
             col_key = self._method_to_column(method_name)
             inv_row[col_key] += paid_amount
 
@@ -127,18 +125,15 @@ class InformeDeCajaWizard(models.TransientModel):
             inv_row['credito'] = max((invoice.amount_total or 0.0) - self._accum_paid(inv_row), 0.0)
             rows_by_invoice[invoice.id] = inv_row
 
-        # 2) Facturas del día (sin pago del día o con parcial) → crédito/residual
-        unpaid_domain = [
+        # 2) Facturas del día sin pago / parcial
+        unpaid_invoices = self.env['account.move'].search([
             ('move_type', '=', 'out_invoice'),
             ('invoice_date', '=', date_val),
             ('state', '=', 'posted'),
-        ]
-        unpaid_invoices = self.env['account.move'].search(unpaid_domain)
+        ])
         for inv in unpaid_invoices:
-            # >>> Nuevo filtro por vendedor ∈ team
-            if not seller_belongs_to_selected_team(inv):
+            if not seller_matches_selection(inv):
                 continue
-
             inv_row = rows_by_invoice.get(inv.id)
             residual = max(inv.amount_residual or 0.0, 0.0)
             if inv_row:
@@ -148,39 +143,42 @@ class InformeDeCajaWizard(models.TransientModel):
                 inv_row['credito'] = residual if residual > 0.0 else (inv.amount_total or 0.0)
             rows_by_invoice[inv.id] = inv_row
 
-        # Orden por fecha desc
+        # Ordenar facturas por fecha desc
         invoice_rows = list(rows_by_invoice.values())
         invoice_rows.sort(key=lambda r: r.get('date_invoice') or pydate(1970, 1, 1), reverse=True)
 
-        # 3) Notas de crédito del día (al final) — también por vendedor ∈ team
-        refund_domain = [
+        # 3) Notas de crédito del día (negativas)
+        refunds = self.env['account.move'].search([
             ('move_type', '=', 'out_refund'),
             ('invoice_date', '=', date_val),
             ('state', '=', 'posted'),
-        ]
+        ])
         refund_rows = []
-        refunds = self.env['account.move'].search(refund_domain)
         for rf in refunds:
-            # >>> Nuevo filtro por vendedor ∈ team
-            if not seller_belongs_to_selected_team(rf):
+            if not seller_matches_selection(rf):
                 continue
-
             rf_row = self._empty_row_from_invoice(rf)
-            # NEGATIVO en Total y en columna agrupada
             rf_row['amount_total'] = -abs(rf.amount_total or 0.0)
             rf_row['transferencia_deposito'] += -abs(rf.amount_total or 0.0)
             refund_rows.append(rf_row)
 
-        # Subtotales y totales
+        # Subtotales / Totales
         inv_sub = self._compute_sums(invoice_rows)
         ref_sub = self._compute_sums(refund_rows)
-        # Asegurar todas las claves
         keys = ['amount_total', 'efectivo', 'debito_tarjeta', 'transferencia_deposito', 'cheque', 'credito']
         grand = {k: (inv_sub.get(k, 0.0) + ref_sub.get(k, 0.0)) for k in keys}
 
+        # Título de selección
+        if seleccion == 'par':
+            sel_name = 'Par Vial'
+        elif seleccion == 'nub':
+            sel_name = 'Ñuble'
+        else:
+            sel_name = 'Administración'
+
         return {
             'date': date_val,
-            'seleccion_name': 'Par Vial' if seleccion == 'par' else 'Ñuble',
+            'seleccion_name': sel_name,
             'invoice_rows': invoice_rows,
             'refund_rows': refund_rows,
             'inv_subtotals': inv_sub,
@@ -188,9 +186,7 @@ class InformeDeCajaWizard(models.TransientModel):
             'grand_totals': grand,
         }
 
-    # -------------------------------------------------
     # Helpers
-    # -------------------------------------------------
     def _empty_row_from_invoice(self, inv):
         partner = inv.partner_id
         return {
