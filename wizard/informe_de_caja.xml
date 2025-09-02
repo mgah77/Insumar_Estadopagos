@@ -105,7 +105,7 @@
                         </colgroup>
 
                         <thead>
-                            <tr style="font-size: 14px;"/>
+                            <tr style="font-size: 14px;">
                                 <th>Prefijo</th>
                                 <th>Número</th>
                                 <th>Fecha Factura</th>
