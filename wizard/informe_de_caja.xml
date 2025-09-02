@@ -66,17 +66,7 @@
                     .section-row td { font-weight: bold; background: #f0f0f0; }
                     .subtotal-row td, .total-row td { font-weight: bold; }
                 </style>
-                     <div class="header">
-                            <div style="position: absolute; top: 10px; left: 10px; width: 100px; height: auto;">
-                                    <img t-att-src="'/web/image/res.company/1/logo'" 
-                                        style="width: 200px; height: auto;" 
-                                        alt="Company Logo"/>
-                                </div> 
-                        <h2 style="margin-bottom:8px;">Informe de caja</h2>
-                    <div style="margin-bottom:12px;">
-                        <span><strong>Fecha:</strong> <t t-esc="fecha"/></span>
-                        <span style="margin-left:20px;"><strong>Selección:</strong> <t t-esc="seleccion_name"/></span>
-                    </div>
+
                 <div class="page">
                     <!-- Variables del contexto -->
                     <t t-set="invoice_rows_day" t-value="invoice_rows_day or []"/>
@@ -91,7 +81,10 @@
                     <t t-set="fecha" t-value="date"/>
                     <t t-set="seleccion_name" t-value="seleccion_name"/>
 
-                    
+                    <h2 style="margin-bottom:8px;">Informe de caja</h2>
+                    <div style="margin-bottom:12px;">
+                        <span><strong>Fecha:</strong> <t t-esc="fecha"/></span>
+                        <span style="margin-left:20px;"><strong>Selección:</strong> <t t-esc="seleccion_name"/></span>
                     </div>
 
                     <table class="table table-sm o_main_table" style="width:100%; border-collapse:collapse;" border="1">
