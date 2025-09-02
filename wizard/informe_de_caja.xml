@@ -37,6 +37,13 @@
               action="action_informe_de_caja_wizard"
               sequence="95"/>
 
+        
+        <menuitem id="menu_informe_de_caja_wizard_2"
+              name="Informe de caja diario"
+              parent="sale.sale_order_menu"
+              action="action_informe_de_caja_wizard"
+              sequence="95"/>
+
     <!-- Acción de reporte -->
     <record id="report_caja" model="ir.actions.report">
         <field name="name">Informe de caja</field>
@@ -53,6 +60,7 @@
             <t t-call="web.basic_layout">
 
                 <style type="text/css">
+                    /* Tabla principal */
                     .o_main_table tbody td { font-size: 11px; }
                     .o_main_table th, .o_main_table td { text-align: center; }
                     .o_main_table th.col-money, .o_main_table td.col-money {
@@ -61,10 +69,13 @@
                     .section-row td { font-weight: bold; background: #f0f0f0; }
                     .subtotal-row td, .total-row td { font-weight: bold; }
 
-                    /* Tablas resumen lado a lado */
-                    .summary-row { display: flex; justify-content: space-between; gap: 24px; margin-top: 12px; }
-                    .summary-table { border-collapse: collapse; width: 48%; }
+                    /* Resúmenes lado a lado (compatibles con wkhtmltopdf) */
+                    .summary-layout { width: 100%; border-collapse: collapse; margin-top: 12px; }
+                    .summary-layout td { vertical-align: top; width: 50%; }
+
+                    .summary-table { border-collapse: collapse; width: 100%; }
                     .summary-table th { text-align: center; font-size: 13px; }
+                    .summary-table td { font-size: 11px; }
                     .summary-table td.label { text-align: center; }
                     .summary-table td.col-money { text-align: right; width: 140px; }
                     .summary-table tfoot td { font-weight: bold; }
@@ -92,7 +103,7 @@
                         <span style="margin-left:20px;"><strong>Selección:</strong> <t t-esc="seleccion_name"/></span>
                     </div>
 
-                    <!-- Tabla principal (idéntica a la versión anterior) -->
+                    <!-- Tabla principal -->
                     <table class="table table-sm o_main_table" style="width:100%; border-collapse:collapse;" border="1">
                         <colgroup>
                             <col/><col/><col/>
@@ -213,97 +224,107 @@
                         </tbody>
                     </table>
 
-                    <!-- ======= RESÚMENES LADO A LADO ======= -->
-                    <div class="summary-row">
-                        <!-- Tabla 1: Medios de pago (individualizados + crédito) -->
-                        <table class="table table-sm summary-table" border="1">
-                            <thead>
-                                <tr>
-                                    <th>Medio</th>
-                                    <th class="col-money">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr><td class="label">Efectivo</td>
-                                    <td class="col-money"><t t-esc="('%.0f' % (method_totals.get('efectivo', 0.0)))"/></td></tr>
-                                <tr><td class="label">Débito</td>
-                                    <td class="col-money"><t t-esc="('%.0f' % (method_totals.get('debito', 0.0)))"/></td></tr>
-                                <tr><td class="label">Tarjeta de crédito</td>
-                                    <td class="col-money"><t t-esc="('%.0f' % (method_totals.get('tarjeta', 0.0)))"/></td></tr>
-                                <tr><td class="label">Transferencia</td>
-                                    <td class="col-money"><t t-esc="('%.0f' % (method_totals.get('transferencia', 0.0)))"/></td></tr>
-                                <tr><td class="label">Depósito</td>
-                                    <td class="col-money"><t t-esc="('%.0f' % (method_totals.get('deposito', 0.0)))"/></td></tr>
-                                <tr><td class="label">Cheque</td>
-                                    <td class="col-money"><t t-esc="('%.0f' % (method_totals.get('cheque', 0.0)))"/></td></tr>
-                                <tr><td class="label">Crédito</td>
-                                    <td class="col-money"><t t-esc="('%.0f' % (credit_total or 0.0))"/></td></tr>
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td class="label">Total</td>
-                                    <td class="col-money">
-                                        <t t-esc="('%.0f' % (
-                                            (method_totals.get('efectivo',0.0))
-                                            + (method_totals.get('debito',0.0))
-                                            + (method_totals.get('tarjeta',0.0))
-                                            + (method_totals.get('transferencia',0.0))
-                                            + (method_totals.get('deposito',0.0))
-                                            + (method_totals.get('cheque',0.0))
-                                            + (credit_total or 0.0)
-                                        ))"/>
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
+                    <!-- ======= RESÚMENES LADO A LADO (tabla contenedora de 2 columnas) ======= -->
+                    <table class="summary-layout">
+                        <tr>
+                            <!-- Columna izquierda: Medios de pago individualizados + Crédito -->
+                            <td>
+                                <table class="table table-sm summary-table" border="1">
+                                    <thead>
+                                        <tr>
+                                            <th>Medio</th>
+                                            <th class="col-money">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td class="label">Efectivo</td>
+                                            <td class="col-money"><t t-esc="('%.0f' % (method_totals.get('efectivo', 0.0)))"/></td></tr>
+                                        <tr><td class="label">Débito</td>
+                                            <td class="col-money"><t t-esc="('%.0f' % (method_totals.get('debito', 0.0)))"/></td></tr>
+                                        <tr><td class="label">Tarjeta de crédito</td>
+                                            <td class="col-money"><t t-esc="('%.0f' % (method_totals.get('tarjeta', 0.0)))"/></td></tr>
+                                        <tr><td class="label">Transferencia</td>
+                                            <td class="col-money"><t t-esc="('%.0f' % (method_totals.get('transferencia', 0.0)))"/></td></tr>
+                                        <tr><td class="label">Depósito</td>
+                                            <td class="col-money"><t t-esc="('%.0f' % (method_totals.get('deposito', 0.0)))"/></td></tr>
+                                        <tr><td class="label">Cheque</td>
+                                            <td class="col-money"><t t-esc="('%.0f' % (method_totals.get('cheque', 0.0)))"/></td></tr>
+                                        <!-- NUEVA FILA: Notas de crédito (monto negativo total de NC) -->
+                                        <tr><td class="label">Notas de crédito</td>
+                                            <td class="col-money"><t t-esc="('%.0f' % (ref_subtotals.get('amount_total', 0.0)))"/></td></tr>
+                                        <tr><td class="label">Crédito</td>
+                                            <td class="col-money"><t t-esc="('%.0f' % (credit_total or 0.0))"/></td></tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td class="label">Total</td>
+                                            <td class="col-money">
+                                                <t t-esc="('%.0f' % (
+                                                    (method_totals.get('efectivo',0.0))
+                                                    + (method_totals.get('debito',0.0))
+                                                    + (method_totals.get('tarjeta',0.0))
+                                                    + (method_totals.get('transferencia',0.0))
+                                                    + (method_totals.get('deposito',0.0))
+                                                    + (method_totals.get('cheque',0.0))
+                                                    + (ref_subtotals.get('amount_total',0.0))
+                                                    + (credit_total or 0.0)
+                                                ))"/>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </td>
 
-                        <!-- Tabla 2: Resumen de Abonos y Ventas del Día -->
-                        <table class="table table-sm summary-table" border="1">
-                            <thead>
-                                <tr>
-                                    <th>Resumen</th>
-                                    <th class="col-money">Total</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td class="label">Cobranzas o abonos</td>
-                                    <td class="col-money">
-                                        <t t-esc="('%.0f' % (
-                                            (abonos_subtotals.get('efectivo', 0.0))
-                                            + (abonos_subtotals.get('debito_tarjeta', 0.0))
-                                            + (abonos_subtotals.get('transferencia_deposito', 0.0))
-                                            + (abonos_subtotals.get('cheque', 0.0))
-                                        ))"/>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="label">Ventas del Día</td>
-                                    <td class="col-money">
-                                        <t t-esc="('%.0f' % (
-                                            (inv_day_subtotals.get('amount_total', 0.0))
-                                            + (ref_subtotals.get('amount_total', 0.0))
-                                        ))"/>
-                                    </td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr>
-                                    <td class="label">Total</td>
-                                    <td class="col-money">
-                                        <t t-esc="('%.0f' % (
-                                            ((abonos_subtotals.get('efectivo', 0.0))
-                                            + (abonos_subtotals.get('debito_tarjeta', 0.0))
-                                            + (abonos_subtotals.get('transferencia_deposito', 0.0))
-                                            + (abonos_subtotals.get('cheque', 0.0)))
-                                            + ((inv_day_subtotals.get('amount_total', 0.0))
-                                            + (ref_subtotals.get('amount_total', 0.0)))
-                                        ))"/>
-                                    </td>
-                                </tr>
-                            </tfoot>
-                        </table>
-                    </div>
+                            <!-- Columna derecha: Resumen de Abonos y Ventas del Día -->
+                            <td>
+                                <table class="table table-sm summary-table" border="1">
+                                    <thead>
+                                        <tr>
+                                            <th>Resumen</th>
+                                            <th class="col-money">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="label">Cobranzas o abonos</td>
+                                            <td class="col-money">
+                                                <t t-esc="('%.0f' % (
+                                                    (abonos_subtotals.get('efectivo', 0.0))
+                                                    + (abonos_subtotals.get('debito_tarjeta', 0.0))
+                                                    + (abonos_subtotals.get('transferencia_deposito', 0.0))
+                                                    + (abonos_subtotals.get('cheque', 0.0))
+                                                ))"/>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="label">Ventas del Día</td>
+                                            <td class="col-money">
+                                                <t t-esc="('%.0f' % (
+                                                    (inv_day_subtotals.get('amount_total', 0.0))
+                                                    + (ref_subtotals.get('amount_total', 0.0))
+                                                ))"/>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td class="label">Total</td>
+                                            <td class="col-money">
+                                                <t t-esc="('%.0f' % (
+                                                    ((abonos_subtotals.get('efectivo', 0.0))
+                                                    + (abonos_subtotals.get('debito_tarjeta', 0.0))
+                                                    + (abonos_subtotals.get('transferencia_deposito', 0.0))
+                                                    + (abonos_subtotals.get('cheque', 0.0)))
+                                                    + ((inv_day_subtotals.get('amount_total', 0.0))
+                                                    + (ref_subtotals.get('amount_total', 0.0)))
+                                                ))"/>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
 
                 </div>
             </t>
