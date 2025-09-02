@@ -1,9 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Wizard y acción: deja tus records anteriores sin cambios -->
+    <record id="view_informe_de_caja_wizard_form" model="ir.ui.view">
+        <field name="name">informe.de.caja.wizard.form</field>
+        <field name="model">informe_de_caja_wizard</field>
+        <field name="arch" type="xml">
+            <form string="Informe de caja diario">
+                <group>
+                    <field name="date"/>
+                    <field name="user_id" readonly="1"/>
+                    <field name="categoria" attrs="{'readonly':[('is_adm','=',False)]}"/>
+                    <field name="is_adm" invisible="1"/>
+                </group>
+                <footer>
+                    <button name="action_print" type="object" string="Imprimir informe" class="btn-primary"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
 
-    <!-- Report action: deja tu record report_caja sin cambios -->
+    <record id="action_informe_de_caja_wizard" model="ir.actions.act_window">
+        <field name="name">Informe de caja diario</field>
+        <field name="res_model">informe_de_caja_wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="view_id" ref="view_informe_de_caja_wizard_form"/>
+    </record>
+
+    <menuitem id="menu_informe_de_caja_wizard"
+              name="Informe de caja diario"
+              parent="account.menu_finance_receivables"
+              action="action_informe_de_caja_wizard"
+              sequence="95"/>
+
+    <record id="report_caja" model="ir.actions.report">
+        <field name="name">Informe de caja</field>
+        <field name="model">informe_de_caja_wizard</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">Insumar_Estadopagos.informe_de_caja</field>
+        <field name="report_file">Insumar_Estadopagos.informe_de_caja</field>
+        <field name="print_report_name">'informe_caja_' + (object.date and object.date.strftime('%Y%m%d') or '')</field>
+    </record>
 
     <!-- TEMPLATE DEL REPORTE -->
     <template id="informe_de_caja">
