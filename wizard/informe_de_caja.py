@@ -60,7 +60,7 @@ class InformeDeCajaWizard(models.TransientModel):
         team_par = self.env['crm.team'].browse(1)
         team_nub = self.env['crm.team'].browse(5)
 
-        # ---- Clasificación por vendedor (para FACTURAS/NC) ----
+        # ---- Clasificación por vendedor (para FACTURAS/NC: día de emisión) ----
         def seller_matches_selection(inv):
             if 'invoice_user_id' not in inv._fields:
                 return False if seleccion in ('par', 'nub') else True
@@ -74,9 +74,8 @@ class InformeDeCajaWizard(models.TransientModel):
             # adm: vendedor NO pertenece a ninguno
             return not in_par and not in_nub
 
-        # ---- Clasificación por usuario del PAGO (para ENTRIES) ----
+        # ---- Clasificación por usuario del PAGO (para ENTRIES: día de pago) ----
         def payment_user_matches_selection(payment):
-            # Usamos user_id si existe; si no, create_uid
             pay_user = getattr(payment, 'user_id', False) or payment.create_uid
             in_par = bool(team_par) and pay_user and (pay_user in team_par.member_ids)
             in_nub = bool(team_nub) and pay_user and (pay_user in team_nub.member_ids)
@@ -90,7 +89,9 @@ class InformeDeCajaWizard(models.TransientModel):
         # Payment Method Lines de los diarios seleccionados
         pml_ids = self.env['account.payment.method.line'].search([('journal_id', 'in', journal_ids)]).ids
 
-        rows_by_invoice = {}
+        # Contenedores separados
+        rows_day_by_invoice = {}     # Facturas del día (incluye pagos del día a facturas del mismo día)
+        rows_abonos_by_invoice = {}  # Abonos: pagos del día aplicados a facturas de otros días
 
         # 1) Asientos de pago (entry) del día para los diarios seleccionados
         entries = self.env['account.move'].search([
@@ -107,7 +108,7 @@ class InformeDeCajaWizard(models.TransientModel):
                 continue
             if not payment.payment_method_line_id or payment.payment_method_line_id.id not in pml_ids:
                 continue
-            # >>> CLAVE: clasificar por el usuario que registra el pago
+            # Clasificar por el usuario que registra el pago
             if not payment_user_matches_selection(payment):
                 continue
 
@@ -125,15 +126,21 @@ class InformeDeCajaWizard(models.TransientModel):
             if paid_amount <= 0.0:
                 continue
 
-            inv_row = rows_by_invoice.get(invoice.id) or self._empty_row_from_invoice(invoice)
+            # ¿Factura del día o de otro día?
+            target_dict = rows_day_by_invoice if (invoice.invoice_date == date_val) else rows_abonos_by_invoice
+
+            inv_row = target_dict.get(invoice.id)
+            if not inv_row:
+                inv_row = self._empty_row_from_invoice(invoice)
 
             # Sumar por método
             col_key = self._method_to_column(method_name)
             inv_row[col_key] += paid_amount
 
-            # Crédito = saldo
+            # Crédito = saldo según pagos acumulados de HOY (no forzamos negativo)
             inv_row['credito'] = max((invoice.amount_total or 0.0) - self._accum_paid(inv_row), 0.0)
-            rows_by_invoice[invoice.id] = inv_row
+
+            target_dict[invoice.id] = inv_row
 
         # 2) Facturas del día sin pago / parcial (clasificadas por VENDEDOR)
         unpaid_invoices = self.env['account.move'].search([
@@ -144,18 +151,21 @@ class InformeDeCajaWizard(models.TransientModel):
         for inv in unpaid_invoices:
             if not seller_matches_selection(inv):
                 continue
-            inv_row = rows_by_invoice.get(inv.id)
+            inv_row = rows_day_by_invoice.get(inv.id)
             residual = max(inv.amount_residual or 0.0, 0.0)
             if inv_row:
                 inv_row['credito'] = max(residual, 0.0)
             else:
                 inv_row = self._empty_row_from_invoice(inv)
                 inv_row['credito'] = residual if residual > 0.0 else (inv.amount_total or 0.0)
-            rows_by_invoice[inv.id] = inv_row
+            rows_day_by_invoice[inv.id] = inv_row
 
-        # Ordenar facturas por fecha desc
-        invoice_rows = list(rows_by_invoice.values())
-        invoice_rows.sort(key=lambda r: r.get('date_invoice') or pydate(1970, 1, 1), reverse=True)
+        # Ordenar listas
+        invoice_rows_day = list(rows_day_by_invoice.values())
+        invoice_rows_day.sort(key=lambda r: r.get('date_invoice') or pydate(1970, 1, 1), reverse=True)
+
+        abonos_rows = list(rows_abonos_by_invoice.values())
+        abonos_rows.sort(key=lambda r: r.get('date_invoice') or pydate(1970, 1, 1), reverse=True)
 
         # 3) Notas de crédito del día (clasificadas por VENDEDOR)
         refunds = self.env['account.move'].search([
@@ -168,15 +178,17 @@ class InformeDeCajaWizard(models.TransientModel):
             if not seller_matches_selection(rf):
                 continue
             rf_row = self._empty_row_from_invoice(rf)
-            rf_row['amount_total'] = -abs(rf.amount_total or 0.0)
-            rf_row['transferencia_deposito'] += -abs(rf.amount_total or 0.0)
+            rf_row['amount_total'] = -abs(rf.amount_total or 0.0)              # total negativo
+            rf_row['transferencia_deposito'] += -abs(rf.amount_total or 0.0)   # columna agrupada negativa
             refund_rows.append(rf_row)
 
         # Subtotales / Totales
-        inv_sub = self._compute_sums(invoice_rows)
-        ref_sub = self._compute_sums(refund_rows)
+        inv_day_sub = self._compute_sums(invoice_rows_day)
+        abonos_sub  = self._compute_sums(abonos_rows)
+        ref_sub     = self._compute_sums(refund_rows)
+
         keys = ['amount_total', 'efectivo', 'debito_tarjeta', 'transferencia_deposito', 'cheque', 'credito']
-        grand = {k: (inv_sub.get(k, 0.0) + ref_sub.get(k, 0.0)) for k in keys}
+        grand = {k: (inv_day_sub.get(k, 0.0) + abonos_sub.get(k, 0.0) + ref_sub.get(k, 0.0)) for k in keys}
 
         # Título de selección
         if seleccion == 'par':
@@ -189,10 +201,18 @@ class InformeDeCajaWizard(models.TransientModel):
         return {
             'date': date_val,
             'seleccion_name': sel_name,
-            'invoice_rows': invoice_rows,
-            'refund_rows': refund_rows,
-            'inv_subtotals': inv_sub,
+
+            # Grupos
+            'invoice_rows_day': invoice_rows_day,   # Facturas del día
+            'abonos_rows': abonos_rows,             # Abonos (pagos a facturas de otros días)
+            'refund_rows': refund_rows,             # Notas de crédito
+
+            # Subtotales por grupo
+            'inv_day_subtotals': inv_day_sub,
+            'abonos_subtotals': abonos_sub,
             'ref_subtotals': ref_sub,
+
+            # Totales generales
             'grand_totals': grand,
         }
 
