@@ -52,9 +52,24 @@
         <t t-call="web.html_container">
             <t t-call="web.basic_layout">
 
-                <!-- Estilo: datos a 11px -->
+                <!-- Estilos: datos 11px, ancho uniforme y alineaciones -->
                 <style type="text/css">
+                    /* Tamaño de letra de los datos */
                     .o_main_table tbody td { font-size: 11px; }
+
+                    /* Por defecto: centrar todo en la tabla */
+                    .o_main_table th,
+                    .o_main_table td { text-align: center; }
+
+                    /* Columnas de valores numéricos: mismo ancho + alineación a la derecha */
+                    .o_main_table th.col-money,
+                    .o_main_table td.col-money {
+                        width: 90px;
+                        white-space: nowrap;
+                        box-sizing: border-box;
+                        text-align: right;
+                    }
+
                     .subtotal-row td, .total-row td { font-weight: bold; }
                 </style>
 
@@ -75,17 +90,31 @@
                     </div>
 
                     <table class="table table-sm o_main_table" style="width:100%; border-collapse:collapse;" border="1">
+                        <!-- Anchos fijos para columnas de valores -->
+                        <colgroup>
+                            <col/> <!-- Prefijo -->
+                            <col/> <!-- Número -->
+                            <col/> <!-- Fecha -->
+                            <col style="width:90px"/> <!-- Total -->
+                            <col style="width:90px"/> <!-- Efectivo -->
+                            <col style="width:90px"/> <!-- Débito/T. Crédito -->
+                            <col style="width:90px"/> <!-- Transf./Depósito/NC -->
+                            <col style="width:90px"/> <!-- Cheque -->
+                            <col style="width:90px"/> <!-- Crédito -->
+                            <col/> <!-- RUT -->
+                        </colgroup>
+
                         <thead>
                             <tr>
                                 <th>Prefijo</th>
                                 <th>Número</th>
                                 <th>Fecha Factura</th>
-                                <th>Total</th>
-                                <th>Efectivo</th>
-                                <th>Débito / T. Crédito</th>
-                                <th>Transf. / Depósito / NC</th>
-                                <th>Cheque</th>
-                                <th>Crédito</th>
+                                <th class="col-money">Total</th>
+                                <th class="col-money">Efectivo</th>
+                                <th class="col-money">Débito / T. Crédito</th>
+                                <th class="col-money">Transf. / Depósito / NC</th>
+                                <th class="col-money">Cheque</th>
+                                <th class="col-money">Crédito</th>
                                 <th>RUT</th>
                             </tr>
                         </thead>
@@ -96,13 +125,13 @@
                                 <td><t t-esc="r.get('sequence_number')"/></td>
                                 <td><t t-esc="r.get('date_invoice')"/></td>
 
-                                <!-- SIN DECIMALES -->
-                                <td class="text-right"><t t-esc="('%.0f' % (r.get('amount_total') or 0.0))"/></td>
-                                <td class="text-right"><t t-esc="('%.0f' % (r.get('efectivo') or 0.0))"/></td>
-                                <td class="text-right"><t t-esc="('%.0f' % (r.get('debito_tarjeta') or 0.0))"/></td>
-                                <td class="text-right"><t t-esc="('%.0f' % (r.get('transferencia_deposito') or 0.0))"/></td>
-                                <td class="text-right"><t t-esc="('%.0f' % (r.get('cheque') or 0.0))"/></td>
-                                <td class="text-right"><t t-esc="('%.0f' % (r.get('credito') or 0.0))"/></td>
+                                <!-- SIN DECIMALES + col-money (alineación derecha) -->
+                                <td class="col-money"><t t-esc="('%.0f' % (r.get('amount_total') or 0.0))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (r.get('efectivo') or 0.0))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (r.get('debito_tarjeta') or 0.0))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (r.get('transferencia_deposito') or 0.0))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (r.get('cheque') or 0.0))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (r.get('credito') or 0.0))"/></td>
 
                                 <td><t t-esc="r.get('document_number')"/></td>
                             </tr>
@@ -110,12 +139,12 @@
                             <!-- SUBTOTALES (tras facturas) -->
                             <tr class="subtotal-row">
                                 <td colspan="3">Subtotales</td>
-                                <td class="text-right"><t t-esc="('%.0f' % (inv_subtotals.get('amount_total', 0.0)))"/></td>
-                                <td class="text-right"><t t-esc="('%.0f' % (inv_subtotals.get('efectivo', 0.0)))"/></td>
-                                <td class="text-right"><t t-esc="('%.0f' % (inv_subtotals.get('debito_tarjeta', 0.0)))"/></td>
-                                <td class="text-right"><t t-esc="('%.0f' % (inv_subtotals.get('transferencia_deposito', 0.0)))"/></td>
-                                <td class="text-right"><t t-esc="('%.0f' % (inv_subtotals.get('cheque', 0.0)))"/></td>
-                                <td class="text-right"><t t-esc="('%.0f' % (inv_subtotals.get('credito', 0.0)))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (inv_subtotals.get('amount_total', 0.0)))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (inv_subtotals.get('efectivo', 0.0)))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (inv_subtotals.get('debito_tarjeta', 0.0)))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (inv_subtotals.get('transferencia_deposito', 0.0)))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (inv_subtotals.get('cheque', 0.0)))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (inv_subtotals.get('credito', 0.0)))"/></td>
                                 <td></td>
                             </tr>
 
@@ -126,12 +155,12 @@
                                 <td><t t-esc="r.get('date_invoice')"/></td>
 
                                 <!-- SIN DECIMALES (valores negativos en NC) -->
-                                <td class="text-right"><t t-esc="('%.0f' % (r.get('amount_total') or 0.0))"/></td>
-                                <td class="text-right"><t t-esc="('%.0f' % (r.get('efectivo') or 0.0))"/></td>
-                                <td class="text-right"><t t-esc="('%.0f' % (r.get('debito_tarjeta') or 0.0))"/></td>
-                                <td class="text-right"><t t-esc="('%.0f' % (r.get('transferencia_deposito') or 0.0))"/></td>
-                                <td class="text-right"><t t-esc="('%.0f' % (r.get('cheque') or 0.0))"/></td>
-                                <td class="text-right"><t t-esc="('%.0f' % (r.get('credito') or 0.0))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (r.get('amount_total') or 0.0))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (r.get('efectivo') or 0.0))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (r.get('debito_tarjeta') or 0.0))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (r.get('transferencia_deposito') or 0.0))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (r.get('cheque') or 0.0))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (r.get('credito') or 0.0))"/></td>
 
                                 <td><t t-esc="r.get('document_number')"/></td>
                             </tr>
@@ -139,24 +168,24 @@
                             <!-- SUBTOTALES (tras NC) -->
                             <tr class="subtotal-row">
                                 <td colspan="3">Subtotales</td>
-                                <td class="text-right"><t t-esc="('%.0f' % (ref_subtotals.get('amount_total', 0.0)))"/></td>
-                                <td class="text-right"><t t-esc="('%.0f' % (ref_subtotals.get('efectivo', 0.0)))"/></td>
-                                <td class="text-right"><t t-esc="('%.0f' % (ref_subtotals.get('debito_tarjeta', 0.0)))"/></td>
-                                <td class="text-right"><t t-esc="('%.0f' % (ref_subtotals.get('transferencia_deposito', 0.0)))"/></td>
-                                <td class="text-right"><t t-esc="('%.0f' % (ref_subtotals.get('cheque', 0.0)))"/></td>
-                                <td class="text-right"><t t-esc="('%.0f' % (ref_subtotals.get('credito', 0.0)))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (ref_subtotals.get('amount_total', 0.0)))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (ref_subtotals.get('efectivo', 0.0)))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (ref_subtotals.get('debito_tarjeta', 0.0)))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (ref_subtotals.get('transferencia_deposito', 0.0)))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (ref_subtotals.get('cheque', 0.0)))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (ref_subtotals.get('credito', 0.0)))"/></td>
                                 <td></td>
                             </tr>
 
                             <!-- TOTALES (suma de ambos subtotales) -->
                             <tr class="total-row">
                                 <td colspan="3">Totales</td>
-                                <td class="text-right"><t t-esc="('%.0f' % (grand_totals.get('amount_total', 0.0)))"/></td>
-                                <td class="text-right"><t t-esc="('%.0f' % (grand_totals.get('efectivo', 0.0)))"/></td>
-                                <td class="text-right"><t t-esc="('%.0f' % (grand_totals.get('debito_tarjeta', 0.0)))"/></td>
-                                <td class="text-right"><t t-esc="('%.0f' % (grand_totals.get('transferencia_deposito', 0.0)))"/></td>
-                                <td class="text-right"><t t-esc="('%.0f' % (grand_totals.get('cheque', 0.0)))"/></td>
-                                <td class="text-right"><t t-esc="('%.0f' % (grand_totals.get('credito', 0.0)))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (grand_totals.get('amount_total', 0.0)))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (grand_totals.get('efectivo', 0.0)))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (grand_totals.get('debito_tarjeta', 0.0)))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (grand_totals.get('transferencia_deposito', 0.0)))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (grand_totals.get('cheque', 0.0)))"/></td>
+                                <td class="col-money"><t t-esc="('%.0f' % (grand_totals.get('credito', 0.0)))"/></td>
                                 <td></td>
                             </tr>
 
