@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Wizard: vista formulario -->
     <record id="view_informe_de_caja_wizard_form" model="ir.ui.view">
         <field name="name">informe.de.caja.wizard.form</field>
         <field name="model">informe_de_caja_wizard</field>
@@ -21,7 +20,6 @@
         </field>
     </record>
 
-    <!-- Acción de ventana del wizard -->
     <record id="action_informe_de_caja_wizard" model="ir.actions.act_window">
         <field name="name">Informe de caja diario</field>
         <field name="res_model">informe_de_caja_wizard</field>
@@ -30,14 +28,12 @@
         <field name="view_id" ref="view_informe_de_caja_wizard_form"/>
     </record>
 
-    <!-- Menú bajo Facturación ▸ Clientes -->
     <menuitem id="menu_informe_de_caja_wizard"
               name="Informe de caja diario"
               parent="account.menu_finance_receivables"
               action="action_informe_de_caja_wizard"
               sequence="95"/>
 
-    <!-- Acción de reporte -->
     <record id="report_caja" model="ir.actions.report">
         <field name="name">Informe de caja</field>
         <field name="model">informe_de_caja_wizard</field>
@@ -47,22 +43,18 @@
         <field name="print_report_name">'informe_caja_' + (object.date and object.date.strftime('%Y%m%d') or '')</field>
     </record>
 
-    <!-- Template QWeb -->
+    <!-- Template QWeb con web.external_layout (incluye meta charset UTF-8) -->
     <template id="informe_de_caja">
-        <t t-call="web.html_container">
-            <!-- Variables del contexto -->
+        <t t-call="web.external_layout">
             <t t-set="rows" t-value="rows or []"/>
             <t t-set="fecha" t-value="date"/>
-            <t t-set="seleccion" t-value="seleccion"/>
             <t t-set="seleccion_name" t-value="seleccion_name"/>
 
             <div class="page">
                 <h2 style="margin-bottom:8px;">Informe de caja</h2>
                 <div style="margin-bottom:12px;">
                     <span><strong>Fecha:</strong> <t t-esc="fecha"/></span>
-                    <span style="margin-left:20px;"><strong>Selección:</strong>
-                        <t t-esc="seleccion_name"/>
-                    </span>
+                    <span style="margin-left:20px;"><strong>Selección:</strong> <t t-esc="seleccion_name"/></span>
                 </div>
 
                 <table class="table table-sm o_main_table" style="width:100%; border-collapse:collapse;" border="1">
