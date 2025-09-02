@@ -133,7 +133,7 @@
                                 <td class="col-money"><t t-esc="('%.0f' % (r.get('cheque') or 0.0))"/></td>
                                 <td class="col-money"><t t-esc="('%.0f' % (r.get('credito') or 0.0))"/></td>
 
-                                <td><t t-esc="r.get('document_number')"/></td>
+                                <td style="width:100px"><t t-esc="r.get('document_number')"/></td>
                             </tr>
 
                             <!-- SUBTOTALES (tras facturas) -->
