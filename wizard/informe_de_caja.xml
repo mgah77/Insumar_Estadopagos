@@ -105,14 +105,14 @@
                         </colgroup>
 
                         <thead>
-                            <tr style="font-size: 14px;">
+                            <tr style="font-size: 13px;">
                                 <th>Prefijo</th>
                                 <th>Número</th>
                                 <th>Fecha Factura</th>
                                 <th class="col-money">Monto</th>
                                 <th class="col-money">Efectivo</th>
-                                <th class="col-money">Tar - Deb</th>
-                                <th class="col-money">Tra - Dep - NC</th>
+                                <th class="col-money">Tar-Deb</th>
+                                <th class="col-money">Tra-Dep-NC</th>
                                 <th class="col-money">Cheque</th>
                                 <th class="col-money">Crédito</th>
                                 <th>RUT</th>
