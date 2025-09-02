@@ -103,10 +103,10 @@
                         </colgroup>
 
                         <thead>
-                            <tr>
-                                <th>Prefijo</th>
-                                <th>Número</th>
-                                <th>Fecha Factura</th>
+                            <tr style="font-size: 13px;">
+                                <th></th>
+                                <th>Documento</th>
+                                <th>Fecha</th>
                                 <th class="col-money">Monto</th>
                                 <th class="col-money">Efectivo</th>
                                 <th class="col-money">Tar-Deb</th>
