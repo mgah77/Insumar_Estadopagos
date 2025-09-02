@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <!-- Wizard: vista formulario -->
+    <!-- Wizard -->
     <record id="view_informe_de_caja_wizard_form" model="ir.ui.view">
         <field name="name">informe.de.caja.wizard.form</field>
         <field name="model">informe_de_caja_wizard</field>
@@ -9,7 +9,6 @@
             <form string="Informe de caja diario">
                 <group>
                     <field name="date"/>
-                    <!-- usuario no clickeable -->
                     <field name="user_id" readonly="1" options="{'no_open': True}"/>
                     <field name="categoria" attrs="{'readonly':[('is_adm','=',False)]}"/>
                     <field name="is_adm" invisible="1"/>
@@ -22,7 +21,7 @@
         </field>
     </record>
 
-    <!-- Acción de ventana del wizard -->
+    <!-- Acción Wizard -->
     <record id="action_informe_de_caja_wizard" model="ir.actions.act_window">
         <field name="name">Informe de caja diario</field>
         <field name="res_model">informe_de_caja_wizard</field>
@@ -31,17 +30,10 @@
         <field name="view_id" ref="view_informe_de_caja_wizard_form"/>
     </record>
 
-    <!-- Menú bajo Facturación ▸ Clientes -->
+    <!-- Menú -->
     <menuitem id="menu_informe_de_caja_wizard"
               name="Informe de caja diario"
               parent="account.menu_finance_receivables"
-              action="action_informe_de_caja_wizard"
-              sequence="95"/>
-
-                  
-        <menuitem id="menu_informe_de_caja_wizard_2"
-              name="Informe de caja diario"
-              parent="sale.sale_order_menu"
               action="action_informe_de_caja_wizard"
               sequence="95"/>
 
@@ -55,31 +47,31 @@
         <field name="print_report_name">'informe_caja_' + (object.date and object.date.strftime('%Y%m%d') or '')</field>
     </record>
 
-    <!-- Template QWeb con html_container + basic_layout -->
+    <!-- Template -->
     <template id="informe_de_caja">
         <t t-call="web.html_container">
             <t t-call="web.basic_layout">
 
-                <!-- Estilos: datos 11px, ancho uniforme, alineaciones y filas de sección -->
                 <style type="text/css">
                     .o_main_table tbody td { font-size: 11px; }
                     .o_main_table th, .o_main_table td { text-align: center; }
                     .o_main_table th.col-money, .o_main_table td.col-money {
-                        width: 90px;
-                        white-space: nowrap;
-                        box-sizing: border-box;
-                        text-align: right;
+                        width: 90px; white-space: nowrap; box-sizing: border-box; text-align: right;
                     }
                     .section-row td { font-weight: bold; background: #f0f0f0; }
                     .subtotal-row td, .total-row td { font-weight: bold; }
-                    .summary-table { margin-top: 12px; width: 50%; border-collapse: collapse; }
-                    .summary-table th { text-align: center; }
+
+                    /* Tablas resumen lado a lado */
+                    .summary-row { display: flex; justify-content: space-between; gap: 24px; margin-top: 12px; }
+                    .summary-table { border-collapse: collapse; width: 48%; }
+                    .summary-table th { text-align: center; font-size: 13px; }
                     .summary-table td.label { text-align: center; }
-                    .summary-table td.col-money { text-align: right; width: 120px; }
+                    .summary-table td.col-money { text-align: right; width: 140px; }
+                    .summary-table tfoot td { font-weight: bold; }
                 </style>
 
                 <div class="page">
-                    <!-- Variables del contexto -->
+                    <!-- Contexto -->
                     <t t-set="invoice_rows_day" t-value="invoice_rows_day or []"/>
                     <t t-set="abonos_rows" t-value="abonos_rows or []"/>
                     <t t-set="refund_rows" t-value="refund_rows or []"/>
@@ -88,6 +80,8 @@
                     <t t-set="abonos_subtotals" t-value="abonos_subtotals or {}"/>
                     <t t-set="ref_subtotals" t-value="ref_subtotals or {}"/>
                     <t t-set="grand_totals" t-value="grand_totals or {}"/>
+                    <t t-set="method_totals" t-value="method_totals or {}"/>
+                    <t t-set="credit_total" t-value="credit_total or 0.0"/>
 
                     <t t-set="fecha" t-value="date"/>
                     <t t-set="seleccion_name" t-value="seleccion_name"/>
@@ -98,21 +92,14 @@
                         <span style="margin-left:20px;"><strong>Selección:</strong> <t t-esc="seleccion_name"/></span>
                     </div>
 
+                    <!-- Tabla principal (idéntica a la versión anterior) -->
                     <table class="table table-sm o_main_table" style="width:100%; border-collapse:collapse;" border="1">
-                        <!-- Anchos fijos para columnas de valores -->
                         <colgroup>
-                            <col/> <!-- Prefijo -->
-                            <col/> <!-- Número -->
-                            <col/> <!-- Fecha -->
-                            <col style="width:90px"/> <!-- Monto -->
-                            <col style="width:90px"/> <!-- Efectivo -->
-                            <col style="width:90px"/> <!-- Tar - Deb -->
-                            <col style="width:90px"/> <!-- Tra - Dep - NC -->
-                            <col style="width:90px"/> <!-- Cheque -->
-                            <col style="width:90px"/> <!-- Crédito -->
-                            <col/> <!-- RUT -->
+                            <col/><col/><col/>
+                            <col style="width:90px"/><col style="width:90px"/><col style="width:90px"/>
+                            <col style="width:90px"/><col style="width:90px"/><col style="width:90px"/>
+                            <col/>
                         </colgroup>
-
                         <thead>
                             <tr>
                                 <th>Prefijo</th>
@@ -129,29 +116,21 @@
                         </thead>
                         <tbody>
 
-                            <!-- ======= FACTURAS DEL DÍA ======= -->
+                            <!-- FACTURAS DEL DÍA -->
                             <t t-if="invoice_rows_day">
-                                <tr class="section-row">
-                                    <td colspan="10">Facturas del Día</td>
-                                </tr>
-
+                                <tr class="section-row"><td colspan="10">Facturas del Día</td></tr>
                                 <tr t-foreach="invoice_rows_day" t-as="r">
                                     <td><t t-esc="r.get('sequence_prefix')"/></td>
                                     <td><t t-esc="r.get('sequence_number')"/></td>
                                     <td><t t-esc="r.get('date_invoice')"/></td>
-
-                                    <!-- SIN DECIMALES -->
                                     <td class="col-money"><t t-esc="('%.0f' % (r.get('amount_total') or 0.0))"/></td>
                                     <td class="col-money"><t t-esc="('%.0f' % (r.get('efectivo') or 0.0))"/></td>
                                     <td class="col-money"><t t-esc="('%.0f' % (r.get('debito_tarjeta') or 0.0))"/></td>
                                     <td class="col-money"><t t-esc="('%.0f' % (r.get('transferencia_deposito') or 0.0))"/></td>
                                     <td class="col-money"><t t-esc="('%.0f' % (r.get('cheque') or 0.0))"/></td>
                                     <td class="col-money"><t t-esc="('%.0f' % (r.get('credito') or 0.0))"/></td>
-
                                     <td><t t-esc="r.get('document_number')"/></td>
                                 </tr>
-
-                                <!-- SUBTOTALES facturas del día -->
                                 <tr class="subtotal-row">
                                     <td colspan="3">Subtotales</td>
                                     <td class="col-money"><t t-esc="('%.0f' % (inv_day_subtotals.get('amount_total', 0.0)))"/></td>
@@ -164,29 +143,21 @@
                                 </tr>
                             </t>
 
-                            <!-- ======= ABONOS (pagos a facturas de otros días) ======= -->
+                            <!-- ABONOS -->
                             <t t-if="abonos_rows">
-                                <tr class="section-row">
-                                    <td colspan="10">Abonos</td>
-                                </tr>
-
+                                <tr class="section-row"><td colspan="10">Abonos</td></tr>
                                 <tr t-foreach="abonos_rows" t-as="r">
                                     <td><t t-esc="r.get('sequence_prefix')"/></td>
                                     <td><t t-esc="r.get('sequence_number')"/></td>
                                     <td><t t-esc="r.get('date_invoice')"/></td>
-
-                                    <!-- SIN DECIMALES -->
                                     <td class="col-money"><t t-esc="('%.0f' % (r.get('amount_total') or 0.0))"/></td>
                                     <td class="col-money"><t t-esc="('%.0f' % (r.get('efectivo') or 0.0))"/></td>
                                     <td class="col-money"><t t-esc="('%.0f' % (r.get('debito_tarjeta') or 0.0))"/></td>
                                     <td class="col-money"><t t-esc="('%.0f' % (r.get('transferencia_deposito') or 0.0))"/></td>
                                     <td class="col-money"><t t-esc="('%.0f' % (r.get('cheque') or 0.0))"/></td>
                                     <td class="col-money"><t t-esc="('%.0f' % (r.get('credito') or 0.0))"/></td>
-
                                     <td><t t-esc="r.get('document_number')"/></td>
                                 </tr>
-
-                                <!-- SUBTOTALES abonos -->
                                 <tr class="subtotal-row">
                                     <td colspan="3">Subtotales</td>
                                     <td class="col-money"><t t-esc="('%.0f' % (abonos_subtotals.get('amount_total', 0.0)))"/></td>
@@ -199,29 +170,21 @@
                                 </tr>
                             </t>
 
-                            <!-- ======= NOTAS DE CRÉDITO ======= -->
+                            <!-- NOTAS DE CRÉDITO -->
                             <t t-if="refund_rows">
-                                <tr class="section-row">
-                                    <td colspan="10">Notas de crédito</td>
-                                </tr>
-
+                                <tr class="section-row"><td colspan="10">Notas de crédito</td></tr>
                                 <tr t-foreach="refund_rows" t-as="r">
                                     <td><t t-esc="r.get('sequence_prefix')"/></td>
                                     <td><t t-esc="r.get('sequence_number')"/></td>
                                     <td><t t-esc="r.get('date_invoice')"/></td>
-
-                                    <!-- SIN DECIMALES (valores negativos en NC) -->
                                     <td class="col-money"><t t-esc="('%.0f' % (r.get('amount_total') or 0.0))"/></td>
                                     <td class="col-money"><t t-esc="('%.0f' % (r.get('efectivo') or 0.0))"/></td>
                                     <td class="col-money"><t t-esc="('%.0f' % (r.get('debito_tarjeta') or 0.0))"/></td>
                                     <td class="col-money"><t t-esc="('%.0f' % (r.get('transferencia_deposito') or 0.0))"/></td>
                                     <td class="col-money"><t t-esc="('%.0f' % (r.get('cheque') or 0.0))"/></td>
                                     <td class="col-money"><t t-esc="('%.0f' % (r.get('credito') or 0.0))"/></td>
-
                                     <td><t t-esc="r.get('document_number')"/></td>
                                 </tr>
-
-                                <!-- SUBTOTALES NC -->
                                 <tr class="subtotal-row">
                                     <td colspan="3">Subtotales</td>
                                     <td class="col-money"><t t-esc="('%.0f' % (ref_subtotals.get('amount_total', 0.0)))"/></td>
@@ -234,7 +197,7 @@
                                 </tr>
                             </t>
 
-                            <!-- ======= TOTALES (solo si hay al menos un grupo con datos) ======= -->
+                            <!-- TOTALES -->
                             <t t-if="invoice_rows_day or abonos_rows or refund_rows">
                                 <tr class="total-row">
                                     <td colspan="3">Totales</td>
@@ -247,76 +210,100 @@
                                     <td></td>
                                 </tr>
                             </t>
-
                         </tbody>
                     </table>
 
-                    <!-- ======= TABLA 1: Medios de pago (incluye Crédito) ======= -->
-                    <table class="table table-sm summary-table" border="1">
-                        <thead>
-                            <tr>
-                                <th>Medio</th>
-                                <th class="col-money">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="label">Efectivo</td>
-                                <td class="col-money"><t t-esc="('%.0f' % (grand_totals.get('efectivo', 0.0)))"/></td>
-                            </tr>
-                            <tr>
-                                <td class="label">Tar - Deb</td>
-                                <td class="col-money"><t t-esc="('%.0f' % (grand_totals.get('debito_tarjeta', 0.0)))"/></td>
-                            </tr>
-                            <tr>
-                                <td class="label">Tra - Dep - NC</td>
-                                <td class="col-money"><t t-esc="('%.0f' % (grand_totals.get('transferencia_deposito', 0.0)))"/></td>
-                            </tr>
-                            <tr>
-                                <td class="label">Cheque</td>
-                                <td class="col-money"><t t-esc="('%.0f' % (grand_totals.get('cheque', 0.0)))"/></td>
-                            </tr>
-                            <tr>
-                                <td class="label">Crédito</td>
-                                <td class="col-money"><t t-esc="('%.0f' % (grand_totals.get('credito', 0.0)))"/></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <!-- ======= RESÚMENES LADO A LADO ======= -->
+                    <div class="summary-row">
+                        <!-- Tabla 1: Medios de pago (individualizados + crédito) -->
+                        <table class="table table-sm summary-table" border="1">
+                            <thead>
+                                <tr>
+                                    <th>Medio</th>
+                                    <th class="col-money">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="label">Efectivo</td>
+                                    <td class="col-money"><t t-esc="('%.0f' % (method_totals.get('efectivo', 0.0)))"/></td></tr>
+                                <tr><td class="label">Débito</td>
+                                    <td class="col-money"><t t-esc="('%.0f' % (method_totals.get('debito', 0.0)))"/></td></tr>
+                                <tr><td class="label">Tarjeta de crédito</td>
+                                    <td class="col-money"><t t-esc="('%.0f' % (method_totals.get('tarjeta', 0.0)))"/></td></tr>
+                                <tr><td class="label">Transferencia</td>
+                                    <td class="col-money"><t t-esc="('%.0f' % (method_totals.get('transferencia', 0.0)))"/></td></tr>
+                                <tr><td class="label">Depósito</td>
+                                    <td class="col-money"><t t-esc="('%.0f' % (method_totals.get('deposito', 0.0)))"/></td></tr>
+                                <tr><td class="label">Cheque</td>
+                                    <td class="col-money"><t t-esc="('%.0f' % (method_totals.get('cheque', 0.0)))"/></td></tr>
+                                <tr><td class="label">Crédito</td>
+                                    <td class="col-money"><t t-esc="('%.0f' % (credit_total or 0.0))"/></td></tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td class="label">Total</td>
+                                    <td class="col-money">
+                                        <t t-esc="('%.0f' % (
+                                            (method_totals.get('efectivo',0.0))
+                                            + (method_totals.get('debito',0.0))
+                                            + (method_totals.get('tarjeta',0.0))
+                                            + (method_totals.get('transferencia',0.0))
+                                            + (method_totals.get('deposito',0.0))
+                                            + (method_totals.get('cheque',0.0))
+                                            + (credit_total or 0.0)
+                                        ))"/>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
 
-                    <!-- ======= TABLA 2: Resumen (Cobranzas/Abonos y Ventas del Día) ======= -->
-                    <table class="table table-sm summary-table" border="1">
-                        <thead>
-                            <tr>
-                                <th>Resumen</th>
-                                <th class="col-money">Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <!-- Cobranzas / Abonos = suma de medios de pago del grupo Abonos -->
-                            <tr>
-                                <td class="label">Cobranzas o abonos</td>
-                                <td class="col-money">
-                                    <t t-esc="('%.0f' % (
-                                        (abonos_subtotals.get('efectivo', 0.0))
-                                        + (abonos_subtotals.get('debito_tarjeta', 0.0))
-                                        + (abonos_subtotals.get('transferencia_deposito', 0.0))
-                                        + (abonos_subtotals.get('cheque', 0.0))
-                                    ))"/>
-                                </td>
-                            </tr>
-
-                            <!-- Ventas del Día = Facturas del Día (Monto) - Notas de Crédito (Monto ya es negativo) -->
-                            <tr>
-                                <td class="label">Ventas del Día</td>
-                                <td class="col-money">
-                                    <t t-esc="('%.0f' % (
-                                        (inv_day_subtotals.get('amount_total', 0.0))
-                                        + (ref_subtotals.get('amount_total', 0.0))
-                                    ))"/>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                        <!-- Tabla 2: Resumen de Abonos y Ventas del Día -->
+                        <table class="table table-sm summary-table" border="1">
+                            <thead>
+                                <tr>
+                                    <th>Resumen</th>
+                                    <th class="col-money">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="label">Cobranzas o abonos</td>
+                                    <td class="col-money">
+                                        <t t-esc="('%.0f' % (
+                                            (abonos_subtotals.get('efectivo', 0.0))
+                                            + (abonos_subtotals.get('debito_tarjeta', 0.0))
+                                            + (abonos_subtotals.get('transferencia_deposito', 0.0))
+                                            + (abonos_subtotals.get('cheque', 0.0))
+                                        ))"/>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="label">Ventas del Día</td>
+                                    <td class="col-money">
+                                        <t t-esc="('%.0f' % (
+                                            (inv_day_subtotals.get('amount_total', 0.0))
+                                            + (ref_subtotals.get('amount_total', 0.0))
+                                        ))"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td class="label">Total</td>
+                                    <td class="col-money">
+                                        <t t-esc="('%.0f' % (
+                                            ((abonos_subtotals.get('efectivo', 0.0))
+                                            + (abonos_subtotals.get('debito_tarjeta', 0.0))
+                                            + (abonos_subtotals.get('transferencia_deposito', 0.0))
+                                            + (abonos_subtotals.get('cheque', 0.0)))
+                                            + ((inv_day_subtotals.get('amount_total', 0.0))
+                                            + (ref_subtotals.get('amount_total', 0.0)))
+                                        ))"/>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
 
                 </div>
             </t>

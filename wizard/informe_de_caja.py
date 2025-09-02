@@ -90,8 +90,18 @@ class InformeDeCajaWizard(models.TransientModel):
         pml_ids = self.env['account.payment.method.line'].search([('journal_id', 'in', journal_ids)]).ids
 
         # Contenedores separados
-        rows_day_by_invoice = {}     # Facturas del día (incluye pagos del día a facturas del mismo día)
-        rows_abonos_by_invoice = {}  # Abonos: pagos del día aplicados a facturas de otros días
+        rows_day_by_invoice = {}     # Facturas del día
+        rows_abonos_by_invoice = {}  # Abonos a facturas de otros días
+
+        # Totales por MEDIO (individualizados)
+        method_totals = {
+            'efectivo': 0.0,
+            'debito': 0.0,
+            'tarjeta': 0.0,
+            'transferencia': 0.0,
+            'deposito': 0.0,
+            'cheque': 0.0,
+        }
 
         # 1) Asientos de pago (entry) del día para los diarios seleccionados
         entries = self.env['account.move'].search([
@@ -113,6 +123,7 @@ class InformeDeCajaWizard(models.TransientModel):
                 continue
 
             method_name = (payment.payment_method_line_id.name or '').strip()
+            method_key = self._method_to_key(method_name)
 
             # Vincular factura: name == ref del asiento
             invoice = self.env['account.move'].search([
@@ -126,6 +137,9 @@ class InformeDeCajaWizard(models.TransientModel):
             if paid_amount <= 0.0:
                 continue
 
+            # Sumar al medio individual
+            method_totals[method_key] = method_totals.get(method_key, 0.0) + paid_amount
+
             # ¿Factura del día o de otro día?
             target_dict = rows_day_by_invoice if (invoice.invoice_date == date_val) else rows_abonos_by_invoice
 
@@ -133,7 +147,7 @@ class InformeDeCajaWizard(models.TransientModel):
             if not inv_row:
                 inv_row = self._empty_row_from_invoice(invoice)
 
-            # Sumar por método
+            # Sumar por columna agrupada del informe
             col_key = self._method_to_column(method_name)
             inv_row[col_key] += paid_amount
 
@@ -198,6 +212,9 @@ class InformeDeCajaWizard(models.TransientModel):
         else:
             sel_name = 'Administración'
 
+        # Crédito total (para tabla de medios individualizados)
+        credit_total = grand.get('credito', 0.0)
+
         return {
             'date': date_val,
             'seleccion_name': sel_name,
@@ -214,6 +231,10 @@ class InformeDeCajaWizard(models.TransientModel):
 
             # Totales generales
             'grand_totals': grand,
+
+            # Medios individualizados y crédito
+            'method_totals': method_totals,
+            'credit_total': credit_total,
         }
 
     # Helpers
@@ -233,6 +254,7 @@ class InformeDeCajaWizard(models.TransientModel):
         }
 
     def _method_to_column(self, method_name):
+        """Mapeo agrupado para columnas del informe principal."""
         m = (method_name or '').strip().lower()
         if m == 'efectivo':
             return 'efectivo'
@@ -243,6 +265,24 @@ class InformeDeCajaWizard(models.TransientModel):
         if m == 'cheque':
             return 'cheque'
         return 'transferencia_deposito'
+
+    def _method_to_key(self, method_name):
+        """Mapeo fino para el resumen de medios individualizados."""
+        m = (method_name or '').strip().lower()
+        if m == 'efectivo':
+            return 'efectivo'
+        if m in ('débito', 'debito'):
+            return 'debito'
+        if m in ('tarjeta de crédito', 'tarjeta de credito'):
+            return 'tarjeta'
+        if m == 'transferencia':
+            return 'transferencia'
+        if m in ('depósito', 'deposito'):
+            return 'deposito'
+        if m == 'cheque':
+            return 'cheque'
+        # Desconocidos: los contamos como transferencia
+        return 'transferencia'
 
     def _accum_paid(self, row):
         return (
