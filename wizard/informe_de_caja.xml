@@ -37,6 +37,12 @@
               parent="account.menu_finance_receivables"
               action="action_informe_de_caja_wizard"
               sequence="95"/>
+    
+        <menuitem id="menu_informe_de_caja_wizard_2"
+              name="Informe de caja diario"
+              parent="sale.sale_order_menu"
+              action="action_informe_de_caja_wizard"
+              sequence="95"/>
 
     <!-- Acción de reporte -->
     <record id="report_caja" model="ir.actions.report">
