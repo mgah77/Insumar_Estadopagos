@@ -9,7 +9,7 @@
             <form string="Informe de caja diario">
                 <group>
                     <field name="date"/>
-                    <field name="user_id" readonly="1"/>
+                    <field name="user_id" readonly="1" options="{'no_open': True}"/>
                     <field name="categoria" attrs="{'readonly':[('is_adm','=',False)]}"/>
                     <field name="is_adm" invisible="1"/>
                 </group>
@@ -105,7 +105,7 @@
                         </colgroup>
 
                         <thead>
-                            <tr>
+                            <tr style="font-size: 14px;"/>
                                 <th>Prefijo</th>
                                 <th>Número</th>
                                 <th>Fecha Factura</th>
