@@ -37,7 +37,8 @@
               parent="account.menu_finance_receivables"
               action="action_informe_de_caja_wizard"
               sequence="95"/>
-    
+
+                  
         <menuitem id="menu_informe_de_caja_wizard_2"
               name="Informe de caja diario"
               parent="sale.sale_order_menu"
@@ -71,6 +72,10 @@
                     }
                     .section-row td { font-weight: bold; background: #f0f0f0; }
                     .subtotal-row td, .total-row td { font-weight: bold; }
+                    .summary-table { margin-top: 12px; width: 50%; border-collapse: collapse; }
+                    .summary-table th { text-align: center; }
+                    .summary-table td.label { text-align: center; }
+                    .summary-table td.col-money { text-align: right; width: 120px; }
                 </style>
 
                 <div class="page">
@@ -109,14 +114,14 @@
                         </colgroup>
 
                         <thead>
-                            <tr style="font-size: 13px;">
-                                <th></th>
-                                <th>Documento</th>
-                                <th>Fecha</th>
+                            <tr>
+                                <th>Prefijo</th>
+                                <th>Número</th>
+                                <th>Fecha Factura</th>
                                 <th class="col-money">Monto</th>
                                 <th class="col-money">Efectivo</th>
-                                <th class="col-money">Tar-Deb</th>
-                                <th class="col-money">Tra-Dep-NC</th>
+                                <th class="col-money">Tar - Deb</th>
+                                <th class="col-money">Tra - Dep - NC</th>
                                 <th class="col-money">Cheque</th>
                                 <th class="col-money">Crédito</th>
                                 <th>RUT</th>
@@ -245,6 +250,74 @@
 
                         </tbody>
                     </table>
+
+                    <!-- ======= TABLA 1: Medios de pago (incluye Crédito) ======= -->
+                    <table class="table table-sm summary-table" border="1">
+                        <thead>
+                            <tr>
+                                <th>Medio</th>
+                                <th class="col-money">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="label">Efectivo</td>
+                                <td class="col-money"><t t-esc="('%.0f' % (grand_totals.get('efectivo', 0.0)))"/></td>
+                            </tr>
+                            <tr>
+                                <td class="label">Tar - Deb</td>
+                                <td class="col-money"><t t-esc="('%.0f' % (grand_totals.get('debito_tarjeta', 0.0)))"/></td>
+                            </tr>
+                            <tr>
+                                <td class="label">Tra - Dep - NC</td>
+                                <td class="col-money"><t t-esc="('%.0f' % (grand_totals.get('transferencia_deposito', 0.0)))"/></td>
+                            </tr>
+                            <tr>
+                                <td class="label">Cheque</td>
+                                <td class="col-money"><t t-esc="('%.0f' % (grand_totals.get('cheque', 0.0)))"/></td>
+                            </tr>
+                            <tr>
+                                <td class="label">Crédito</td>
+                                <td class="col-money"><t t-esc="('%.0f' % (grand_totals.get('credito', 0.0)))"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- ======= TABLA 2: Resumen (Cobranzas/Abonos y Ventas del Día) ======= -->
+                    <table class="table table-sm summary-table" border="1">
+                        <thead>
+                            <tr>
+                                <th>Resumen</th>
+                                <th class="col-money">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Cobranzas / Abonos = suma de medios de pago del grupo Abonos -->
+                            <tr>
+                                <td class="label">Cobranzas o abonos</td>
+                                <td class="col-money">
+                                    <t t-esc="('%.0f' % (
+                                        (abonos_subtotals.get('efectivo', 0.0))
+                                        + (abonos_subtotals.get('debito_tarjeta', 0.0))
+                                        + (abonos_subtotals.get('transferencia_deposito', 0.0))
+                                        + (abonos_subtotals.get('cheque', 0.0))
+                                    ))"/>
+                                </td>
+                            </tr>
+
+                            <!-- Ventas del Día = Facturas del Día (Monto) - Notas de Crédito (Monto ya es negativo) -->
+                            <tr>
+                                <td class="label">Ventas del Día</td>
+                                <td class="col-money">
+                                    <t t-esc="('%.0f' % (
+                                        (inv_day_subtotals.get('amount_total', 0.0))
+                                        + (ref_subtotals.get('amount_total', 0.0))
+                                    ))"/>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
                 </div>
             </t>
         </t>
