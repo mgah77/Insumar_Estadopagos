@@ -57,6 +57,7 @@
     <!-- Template -->
     <template id="informe_de_caja">
         <t t-call="web.html_container">
+        <t t-set="report_title">Informe de caja</t>
             <t t-call="web.basic_layout">
 
                 <style type="text/css">
@@ -97,7 +98,6 @@
                     <t t-set="fecha" t-value="date"/>
                     <t t-set="seleccion_name" t-value="seleccion_name"/>
 
-                    <h2 style="margin-bottom:8px;">Informe de caja</h2>
                     <div style="margin-bottom:12px;">
                         <span><strong>Fecha:</strong> <t t-esc="fecha"/></span>
                         <span style="margin-left:20px;"><strong>Selección:</strong> <t t-esc="seleccion_name"/></span>
