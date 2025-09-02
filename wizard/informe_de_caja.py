@@ -17,6 +17,9 @@ class InformeDeCajaWizard(models.TransientModel):
     ], string='Selección', required=True, default=lambda self: self._default_categoria())
     is_adm = fields.Boolean(string='Es Administrador', compute='_compute_is_adm', store=False)
 
+    # -------------------------------------------------
+    # Defaults / Computes
+    # -------------------------------------------------
     @api.model
     def _default_categoria(self):
         user = self.env.user
@@ -38,6 +41,9 @@ class InformeDeCajaWizard(models.TransientModel):
             is_nub = bool(nub_team) and (user in nub_team.member_ids)
             rec.is_adm = not (is_par or is_nub)
 
+    # -------------------------------------------------
+    # Actions
+    # -------------------------------------------------
     def action_print(self):
         self.ensure_one()
         if self.categoria == 'adm':
@@ -45,6 +51,9 @@ class InformeDeCajaWizard(models.TransientModel):
         data = self._build_report_data()
         return self.env.ref('Insumar_Estadopagos.report_caja').report_action(self, data=data)
 
+    # -------------------------------------------------
+    # Report data
+    # -------------------------------------------------
     def _build_report_data(self):
         self.ensure_one()
         date_val = self.date
@@ -95,7 +104,7 @@ class InformeDeCajaWizard(models.TransientModel):
             if 'team_id' in invoice._fields and selected_team_id and (invoice.team_id.id != selected_team_id):
                 continue
 
-            # Monto tomado directamente de account.payment (sin decimales en PDF)
+            # Monto tomado directamente de account.payment
             paid_amount = abs(payment.amount or 0.0)
             if paid_amount <= 0.0:
                 continue
@@ -147,19 +156,20 @@ class InformeDeCajaWizard(models.TransientModel):
         refunds = self.env['account.move'].search(refund_domain)
         for rf in refunds:
             rf_row = self._empty_row_from_invoice(rf)
-            # NC deben ir NEGATIVAS en la columna agrupada
+            # Hacer NEGATIVOS los valores de NC
+            rf_row['amount_total'] = -abs(rf.amount_total or 0.0)
             rf_row['transferencia_deposito'] += -abs(rf.amount_total or 0.0)
             refund_rows.append(rf_row)
 
-        # Pasamos también la clave técnica de selección para el template (Ñ)
         return {
             'date': date_val,
-            'seleccion': seleccion,  # 'par' o 'nub'
             'seleccion_name': 'Par Vial' if seleccion == 'par' else 'Ñuble',
             'rows': rows + refund_rows,
         }
 
+    # -------------------------------------------------
     # Helpers
+    # -------------------------------------------------
     def _empty_row_from_invoice(self, inv):
         partner = inv.partner_id
         return {
