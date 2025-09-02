@@ -17,9 +17,6 @@ class InformeDeCajaWizard(models.TransientModel):
     ], string='Selección', required=True, default=lambda self: self._default_categoria())
     is_adm = fields.Boolean(string='Es Administrador', compute='_compute_is_adm', store=False)
 
-    # -------------------------------------------------
-    # Defaults / Computes
-    # -------------------------------------------------
     @api.model
     def _default_categoria(self):
         user = self.env.user
@@ -41,9 +38,6 @@ class InformeDeCajaWizard(models.TransientModel):
             is_nub = bool(nub_team) and (user in nub_team.member_ids)
             rec.is_adm = not (is_par or is_nub)
 
-    # -------------------------------------------------
-    # Actions
-    # -------------------------------------------------
     def action_print(self):
         self.ensure_one()
         if self.categoria == 'adm':
@@ -51,21 +45,18 @@ class InformeDeCajaWizard(models.TransientModel):
         data = self._build_report_data()
         return self.env.ref('Insumar_Estadopagos.report_caja').report_action(self, data=data)
 
-    # -------------------------------------------------
-    # Report data
-    # -------------------------------------------------
     def _build_report_data(self):
         self.ensure_one()
         date_val = self.date
         seleccion = self.categoria
 
-        # Journals por selección (cajas/bancos por sucursal)
+        # Journals por selección
         journal_map = {'par': 12, 'nub': 14}
         journal_id = journal_map.get(seleccion)
         if not journal_id:
             raise UserError(_('No se encontró journal para la selección.'))
 
-        # Teams por selección (ventas por sucursal)
+        # Teams por selección
         team_map = {'par': 1, 'nub': 5}
         selected_team_id = team_map.get(seleccion)
 
@@ -74,7 +65,7 @@ class InformeDeCajaWizard(models.TransientModel):
 
         rows_by_invoice = {}
 
-        # 1) Asientos de pago del día (entry) del journal seleccionado
+        # 1) Asientos de pago (entry) del día para ese journal
         entries = self.env['account.move'].search([
             ('move_type', '=', 'entry'),
             ('date', '=', date_val),
@@ -92,7 +83,7 @@ class InformeDeCajaWizard(models.TransientModel):
 
             method_name = (payment.payment_method_line_id.name or '').strip()
 
-            # Factura cuyo name coincide con ref del asiento de pago
+            # Factura: name == ref del asiento
             invoice = self.env['account.move'].search([
                 ('move_type', '=', 'out_invoice'),
                 ('name', '=', entry.ref or ''),
@@ -100,18 +91,17 @@ class InformeDeCajaWizard(models.TransientModel):
             if not invoice:
                 continue
 
-            # FILTRO por team (sucursal) en la factura
+            # Filtrar por sucursal (team) en la factura
             if 'team_id' in invoice._fields and selected_team_id and (invoice.team_id.id != selected_team_id):
                 continue
 
-            # Monto tomado directamente de account.payment
             paid_amount = abs(payment.amount or 0.0)
             if paid_amount <= 0.0:
                 continue
 
             inv_row = rows_by_invoice.get(invoice.id) or self._empty_row_from_invoice(invoice)
 
-            # Sumar en columna por método
+            # Columna según método
             col_key = self._method_to_column(method_name)
             inv_row[col_key] += paid_amount
 
@@ -119,7 +109,7 @@ class InformeDeCajaWizard(models.TransientModel):
             inv_row['credito'] = max((invoice.amount_total or 0.0) - self._accum_paid(inv_row), 0.0)
             rows_by_invoice[invoice.id] = inv_row
 
-        # 2) Facturas del día SIN pagos del día (o con parcial) → crédito/residual
+        # 2) Facturas del día (sin pago del día o con parcial) → crédito/residual
         unpaid_domain = [
             ('move_type', '=', 'out_invoice'),
             ('invoice_date', '=', date_val),
@@ -139,11 +129,11 @@ class InformeDeCajaWizard(models.TransientModel):
                 inv_row['credito'] = residual if residual > 0.0 else (inv.amount_total or 0.0)
             rows_by_invoice[inv.id] = inv_row
 
-        # Orden: fecha desc
-        rows = list(rows_by_invoice.values())
-        rows.sort(key=lambda r: r.get('date_invoice') or pydate(1970, 1, 1), reverse=True)
+        # Orden por fecha desc
+        invoice_rows = list(rows_by_invoice.values())
+        invoice_rows.sort(key=lambda r: r.get('date_invoice') or pydate(1970, 1, 1), reverse=True)
 
-        # 3) Notas de crédito del día (al final), filtradas por team también
+        # 3) Notas de crédito del día (al final) por team
         refund_domain = [
             ('move_type', '=', 'out_refund'),
             ('invoice_date', '=', date_val),
@@ -156,15 +146,24 @@ class InformeDeCajaWizard(models.TransientModel):
         refunds = self.env['account.move'].search(refund_domain)
         for rf in refunds:
             rf_row = self._empty_row_from_invoice(rf)
-            # Hacer NEGATIVOS los valores de NC
+            # NEGATIVO en Total y en columna agrupada
             rf_row['amount_total'] = -abs(rf.amount_total or 0.0)
             rf_row['transferencia_deposito'] += -abs(rf.amount_total or 0.0)
             refund_rows.append(rf_row)
 
+        # Subtotales y totales
+        inv_sub = self._compute_sums(invoice_rows)
+        ref_sub = self._compute_sums(refund_rows)
+        grand = {k: (inv_sub.get(k, 0.0) + ref_sub.get(k, 0.0)) for k in inv_sub.keys()}
+
         return {
             'date': date_val,
             'seleccion_name': 'Par Vial' if seleccion == 'par' else 'Ñuble',
-            'rows': rows + refund_rows,
+            'invoice_rows': invoice_rows,
+            'refund_rows': refund_rows,
+            'inv_subtotals': inv_sub,
+            'ref_subtotals': ref_sub,
+            'grand_totals': grand,
         }
 
     # -------------------------------------------------
@@ -204,3 +203,11 @@ class InformeDeCajaWizard(models.TransientModel):
             + row.get('transferencia_deposito', 0.0)
             + row.get('cheque', 0.0)
         )
+
+    def _compute_sums(self, rows):
+        keys = ['amount_total', 'efectivo', 'debito_tarjeta', 'transferencia_deposito', 'cheque', 'credito']
+        totals = {k: 0.0 for k in keys}
+        for r in rows:
+            for k in keys:
+                totals[k] += float(r.get(k) or 0.0)
+        return totals
