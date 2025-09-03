@@ -105,11 +105,6 @@
                     <t t-set="fecha" t-value="date"/>
                     <t t-set="seleccion_name" t-value="seleccion_name"/>
 
-                    <div style="margin-bottom:12px;">
-                        <span><strong>Fecha:</strong> <t t-esc="fecha"/></span>
-                        <span style="margin-left:20px;"><strong>Selección:</strong> <t t-esc="seleccion_name"/></span>
-                    </div>
-
                     <!-- Tabla principal -->
                     <table class="table table-sm o_main_table" style="width:100%; border-collapse:collapse;" border="1">
                         <colgroup>
@@ -119,10 +114,10 @@
                             <col/>
                         </colgroup>
                         <thead>
-                            <tr tyle="font-size:14px;">
+                            <tr style="font-size:14px;">
                                 <th></th>
                                 <th>Documento</th>
-                                <th>Fecha Factura</th>
+                                <th>Fecha</th>
                                 <th class="col-money">Monto</th>
                                 <th class="col-money">Efectivo</th>
                                 <th class="col-money">Tar-Deb</th>
