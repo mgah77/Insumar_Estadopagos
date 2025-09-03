@@ -82,11 +82,11 @@
                     .summary-table tfoot td { font-weight: bold; }
                 </style>
                 <div class="header">
-                    <div style="text-align:center; font-weight:700; font-size:16px;">
+                    <div style="text-align:center; font-weight:700; font-size:17px;">
                         Informe de caja
                     </div>
-                    <div style="text-align:center; font-size:11px; margin-top:2px;">
-                        Selección: <t t-esc="seleccion_name"/> — Fecha: <t t-esc="date"/>
+                    <div style="text-align:center; font-size:14px; margin-top:2px;">
+                        Caja: <t t-esc="seleccion_name"/> — Fecha: <t t-esc="date"/>
                     </div>
                 </div>
                 <div class="page">
@@ -119,14 +119,14 @@
                             <col/>
                         </colgroup>
                         <thead>
-                            <tr>
-                                <th>Prefijo</th>
-                                <th>Número</th>
+                            <tr tyle="font-size:14px;">
+                                <th></th>
+                                <th>Documento</th>
                                 <th>Fecha Factura</th>
                                 <th class="col-money">Monto</th>
                                 <th class="col-money">Efectivo</th>
-                                <th class="col-money">Tar - Deb</th>
-                                <th class="col-money">Tra - Dep - NC</th>
+                                <th class="col-money">Tar-Deb</th>
+                                <th class="col-money">Tra-Dep-NC</th>
                                 <th class="col-money">Cheque</th>
                                 <th class="col-money">Crédito</th>
                                 <th>RUT</th>
@@ -239,8 +239,8 @@
                                 <table class="table table-sm summary-table" border="1">
                                     <thead>
                                         <tr>
-                                            <th>Medio</th>
-                                            <th class="col-money">Total</th>
+                                            <th></th>
+                                            <th class="col-money"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -287,8 +287,8 @@
                                 <table class="table table-sm summary-table" border="1">
                                     <thead>
                                         <tr>
-                                            <th>Resumen</th>
-                                            <th class="col-money">Total</th>
+                                            <th></th>
+                                            <th class="col-money"></th>
                                         </tr>
                                     </thead>
                                     <tbody>
