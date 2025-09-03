@@ -57,15 +57,7 @@
     <!-- Template -->
     <template id="informe_de_caja">
         <t t-call="web.html_container">
-            <t t-set="header">
-                <div style="text-align:center;">
-                    <div style="font-size:16px; font-weight:bold;">Informe de caja</div>
-                    <!-- si quieres también aquí la selección y la fecha, descomenta: -->
-                    <!-- <div style="margin-top:2px; font-size:11px;">
-                        Selección: <t t-esc="seleccion_name"/> — Fecha: <t t-esc="date"/>
-                    </div> -->
-                </div>
-            </t>
+
             <t t-call="web.basic_layout">
 
                 <style type="text/css">
@@ -89,7 +81,14 @@
                     .summary-table td.col-money { text-align: right; width: 140px; }
                     .summary-table tfoot td { font-weight: bold; }
                 </style>
-
+                <div class="header">
+                    <div style="text-align:center; font-weight:700; font-size:16px;">
+                        Informe de caja
+                    </div>
+                    <div style="text-align:center; font-size:11px; margin-top:2px;">
+                        Selección: <t t-esc="seleccion_name"/> — Fecha: <t t-esc="date"/>
+                    </div>
+                </div>
                 <div class="page">
                     <!-- Contexto -->
                     <t t-set="invoice_rows_day" t-value="invoice_rows_day or []"/>
