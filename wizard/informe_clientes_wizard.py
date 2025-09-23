@@ -10,7 +10,7 @@ class InformeClientesWizard(models.TransientModel):
     partner_id = fields.Many2one(
         'res.partner', 
         string='Cliente',
-        domain=[('customer_rank', '>', 0)],
+        domain=[('is_customer', '=', True)],
         required=True
     )
 
