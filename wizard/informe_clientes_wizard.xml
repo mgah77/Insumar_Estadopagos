@@ -24,7 +24,7 @@
                 <sheet>
                     <group>
                         <group>
-                        <field name="partner_id"/>      
+                        <field name="partner_id" options="{'no_create': True}"/>      
                         <field name="tipo_facturas" widget="radio" options="{'horizontal': true}"/>                        
                         <field name="rango_fechas"/>
                         </group>
