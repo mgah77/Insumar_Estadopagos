@@ -258,7 +258,7 @@ class InformeDeCajaWizard(models.TransientModel):
         m = (method_name or '').strip().lower()
         if m == 'efectivo':
             return 'efectivo'
-        if m in ('débito', 'debito', 'tarjeta de crédito', 'tarjeta de credito'):
+        if m in ('débito', 'Débito', 'tarjeta de crédito', 'tarjeta de credito'):
             return 'debito_tarjeta'
         if m in ('transferencia', 'depósito', 'deposito'):
             return 'transferencia_deposito'
