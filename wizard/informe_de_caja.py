@@ -63,7 +63,7 @@ class InformeDeCajaWizard(models.TransientModel):
         elif seleccion == 'nub':
             journal_ids = [14]
         else:  # adm
-            journal_ids = [12, 14]
+            journal_ids = [7,12, 14]
 
         # Teams de sucursales
         team_par = self.env['crm.team'].browse(1)
