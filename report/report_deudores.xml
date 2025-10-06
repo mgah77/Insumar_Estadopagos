@@ -36,7 +36,24 @@
                                 </t>
                             </tbody>
                         </table>
+
                     </t>
+                        <table class="table table-bordered" style="width: 100%; margin-bottom: 15px;">
+                            <tbody>
+                                <tr style="font-weight: bold; font-size: 13px; background-color: #e0e0e0;">
+                                    <td colspan="4" style="text-align: right;">TOTAL GENERAL</td>
+                                    <td style="text-align: right;">
+                                        <t t-esc="'${:,.0f}'.format(sum(f['amount_total'] for c in clientes for f in c['facturas']))"/>
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <t t-esc="'${:,.0f}'.format(sum(f['abono'] for c in clientes for f in c['facturas']))"/>
+                                    </td>
+                                    <td style="text-align: right;">
+                                        <t t-esc="'${:,.0f}'.format(sum(f['amount_residual'] for c in clientes for f in c['facturas']))"/>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                 </div>
             </t>
         </t>
