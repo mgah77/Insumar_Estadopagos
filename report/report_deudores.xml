@@ -29,9 +29,9 @@
                                         <td><t t-esc="factura['name']"/></td>
                                         <td><t t-esc="factura['invoice_date']"/></td>
                                         <td><t t-esc="factura['invoice_date_due']"/></td>
-                                        <td style="text-align: right;"><t t-esc="'${:,.0f}'.format(factura['amount_total'])"/></td>
-                                        <td style="text-align: right;"><t t-esc="'${:,.0f}'.format(factura['abono'])"/></td>
-                                        <td style="text-align: right;"><t t-esc="'${:,.0f}'.format(factura['amount_residual'])"/></td>
+                                        <td style="text-align: right;"><t t-esc="'${:,.0f}'.format(factura['amount_total']).replace(',', '.')"/></td>
+                                        <td style="text-align: right;"><t t-esc="'${:,.0f}'.format(factura['abono']).replace(',', '.')"/></td>
+                                        <td style="text-align: right;"><t t-esc="'${:,.0f}'.format(factura['amount_residual']).replace(',', '.')"/></td>
                                     </tr>
                                 </t>
                             </tbody>
@@ -40,16 +40,18 @@
                     </t>
                         <table class="table table-bordered" style="width: 100%; margin-bottom: 15px;">
                             <tbody>
-                                <tr style="font-weight: bold; font-size: 13px; background-color: #e0e0e0;">
-                                    <td colspan="4" style="text-align: right;">TOTAL GENERAL</td>
+                                <tr style="font-weight: bold; font-size: 15px; background-color: #e0e0e0;">
+                                    <td></td>
+                                    <td></td>
+                                    <td style="text-align: right;">TOTAL GENERAL</td>
                                     <td style="text-align: right;">
-                                        <t t-esc="'${:,.0f}'.format(sum(f['amount_total'] for c in clientes for f in c['facturas']))"/>
+                                        <t t-esc="'${:,.0f}'.format(sum(f['amount_total'] for c in clientes for f in c['facturas'])).replace(',', '.')"/>
                                     </td>
                                     <td style="text-align: right;">
-                                        <t t-esc="'${:,.0f}'.format(sum(f['abono'] for c in clientes for f in c['facturas']))"/>
+                                        <t t-esc="'${:,.0f}'.format(sum(f['abono'] for c in clientes for f in c['facturas'])).replace(',', '.')"/>
                                     </td>
                                     <td style="text-align: right;">
-                                        <t t-esc="'${:,.0f}'.format(sum(f['amount_residual'] for c in clientes for f in c['facturas']))"/>
+                                        <t t-esc="'${:,.0f}'.format(sum(f['amount_residual'] for c in clientes for f in c['facturas'])).replace(',', '.')"/>
                                     </td>
                                 </tr>
                             </tbody>
