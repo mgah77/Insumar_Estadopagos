@@ -36,7 +36,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <t t-foreach="cliente['facturas']" t-as="factura">
+                                <t t-foreach="sorted(cliente['facturas'], key=lambda f: f['invoice_date'], reverse=True)" t-as="factura">
                                     <tr style="font-size: 12px;">
                                         <td><t t-esc="factura['name']"/></td>
                                         <td><t t-esc="factura['invoice_date']"/></td>
