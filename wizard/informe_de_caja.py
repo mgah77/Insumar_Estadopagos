@@ -333,7 +333,7 @@ class InformeDeCajaWizard(models.TransientModel):
         # 'deb' o 'tarj' + ('cred' o 'debi') → mezcla de tarjeta crédito/débito
         if ('deb' in m) or ('tarj' in m and ('cred' in m or 'debi' in m)):
             return 'debito_tarjeta'
-        if ('tran' in m) or ('transfer' in m) or ('deposit' in m) or ('depos' in m):
+        if 'transf' in m or 'transfer' in m or 'deposit' in m or 'depos' in m:
             return 'transferencia_deposito'
         if 'cheq' in m:
             return 'cheque'
@@ -352,7 +352,7 @@ class InformeDeCajaWizard(models.TransientModel):
             return 'debito'
         if 'tarj' in m and 'cred' in m:
             return 'tarjeta'
-        if 'tran' in m or 'transfer' in m:
+        if 'transf' in m or 'transfer' in m:
             return 'transferencia'
         if 'deposit' in m or 'depos' in m:
             return 'deposito'
