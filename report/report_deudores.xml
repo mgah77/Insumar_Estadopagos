@@ -33,6 +33,19 @@
                                         <td style="text-align: right;"><t t-esc="'${:,.0f}'.format(factura['abono']).replace(',', '.')"/></td>
                                         <td style="text-align: right;"><t t-esc="'${:,.0f}'.format(factura['amount_residual']).replace(',', '.')"/></td>
                                     </tr>
+                                     <!-- SubTotales -->
+                                    <tr style="font-weight: bold; font-size: 13px; background-color: #f0f0f0;">
+                                        <td colspan="4" style="text-align: right;">TOTAL</td>
+                                        <td style="text-align: right;">
+                                            <t t-esc="'${:,.0f}'.format(sum(f['amount_total'] for f in cliente['facturas'])).replace(',', '.')"/>
+                                        </td>
+                                        <td style="text-align: right;">
+                                            <t t-esc="'${:,.0f}'.format(sum(f['abono'] for f in cliente['facturas'])).replace(',', '.')"/>
+                                        </td>
+                                        <td style="text-align: right;">
+                                            <t t-esc="'${:,.0f}'.format(sum(f['amount_residual'] for f in cliente['facturas'])).replace(',', '.')"/>
+                                        </td>
+                                    </tr>
                                 </t>
                             </tbody>
                         </table>
