@@ -54,7 +54,9 @@ class DeudoresWizard(models.TransientModel):
                 'abono': abono,
                 'amount_residual': factura.amount_residual,
             })
-        
+            
+        for c in clientes.values():
+            c['facturas'].sort(key=lambda f: f['name'] or '')
         # Ordenar clientes por document_number
         clientes_ordenados = sorted(clientes.values(), key=lambda x: x['document_number'])
         data['clientes'] = clientes_ordenados
