@@ -63,26 +63,20 @@ class InformeClientesWizard(models.TransientModel):
             ('partner_id', '=', self.partner_id.id)
         ])
 
-        # Crear lista de IDs filtrados
         ids_filtrados = []
         for factura in facturas_bruto:
-            if (factura.invoice_date and 
-                self.fecha_desde <= factura.invoice_date_due <= self.fecha_hasta):
+            if self.fecha_desde <= factura.invoice_date_due <= self.fecha_hasta:
                 ids_filtrados.append(factura.id)
 
         facturas_filtradas = self.env['account.move'].browse(ids_filtrados)
 
-        if self.tipo_facturas and self.tipo_facturas == 'todas':
-            pass
-        elif self.tipo_facturas and self.tipo_facturas == 'impagas':
-            # Crear segun do lista de IDs filtrados
+        if self.tipo_facturas == 'impagas':
             ids_fechados = []
             for factura in facturas_filtradas:
-                if (factura.payment_state and 
-                    factura.payment_state in ['not_paid', 'partial']):
-                    ids_fechados.append(factura.id)                    
+                if factura.payment_state in ['not_paid', 'partial']:
+                    ids_fechados.append(factura.id)
             facturas_filtradas = self.env['account.move'].browse(ids_fechados)
-            
+
         facturas = facturas_filtradas
         
         clientes = {}
@@ -96,17 +90,22 @@ class InformeClientesWizard(models.TransientModel):
                 }
             
             abono = factura.amount_total - factura.amount_residual
+
             clientes[partner.id]['facturas'].append({
                 'name': factura.sii_document_number,
-                'invoice_date': factura.invoice_date.strftime('%d/%m/%Y') if factura.invoice_date else '',
-                'invoice_date_due': factura.invoice_date_due.strftime('%d/%m/%Y') if factura.invoice_date_due else '',
-                'glosa': factura.glosa,
+                'invoice_date': factura.invoice_date.strftime('%d/%m/%Y'),
+                'invoice_date_due': factura.invoice_date_due.strftime('%d/%m/%Y'),
+                'glosa': factura.glosa or '',
                 'amount_total': factura.amount_total,
                 'abono': abono,
                 'amount_residual': factura.amount_residual,
             })
-        
-        # Ordenar clientes por document_number
+
+        # 🔽 Ordenar facturas por nombre (folio) descendente
+        for c in clientes.values():
+            c['facturas'].sort(key=lambda f: f.get('name') or '', reverse=True)
+
+        # Ordenar clientes por RUT
         clientes_ordenados = sorted(clientes.values(), key=lambda x: x['document_number'])
         data['clientes'] = clientes_ordenados
         
