@@ -3,7 +3,6 @@ from datetime import date as pydate
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
-TRANSFER_PML_IDS = {20, 23, 27, 30, 36, 46}
 
 class InformeDeCajaWizard(models.TransientModel):
     _name = 'informe_de_caja_wizard'
@@ -126,24 +125,21 @@ class InformeDeCajaWizard(models.TransientModel):
 
         for entry in entries:
             payment = entry.payment_id
-            if not payment or not payment.payment_method_line_id:
+            if not payment:
                 continue
-            if payment.payment_method_line_id.id not in pml_ids:
+
+            # metodo de pago válido para los diarios seleccionados
+            if not payment.payment_method_line_id or payment.payment_method_line_id.id not in pml_ids:
                 continue
+
+            # clasificar por usuario que registró el pago
             if not payment_user_matches_selection(payment):
                 continue
 
-            pml_id = payment.payment_method_line_id.id
             method_name = (payment.payment_method_line_id.name or '').strip()
+            method_key = self._method_to_key(method_name)           # para tabla de medios
+            col_key    = self._method_to_column(method_name)        # para columnas del informe
 
-            # ⬇️ Forzar "Transferencia" por IDs dados
-            if pml_id in TRANSFER_PML_IDS:
-                method_key = 'transferencia'           # para tabla de medios individualizados
-                col_key = 'transferencia_deposito'     # columna agrupada
-            else:
-                method_key = self._method_to_key(method_name)
-                col_key = self._method_to_column(method_name)
-                
             # Buscar la factura:
             # 1) por ref == name
             invoice = self.env['account.move'].search([
@@ -337,7 +333,7 @@ class InformeDeCajaWizard(models.TransientModel):
         # 'deb' o 'tarj' + ('cred' o 'debi') → mezcla de tarjeta crédito/débito
         if ('deb' in m) or ('tarj' in m and ('cred' in m or 'debi' in m)):
             return 'debito_tarjeta'
-        if 'transf' in m or 'transfer' in m or 'deposit' in m or 'depos' in m:
+        if 'Transferencia' in m or 'transfer' in m or 'deposit' in m or 'depos' in m:
             return 'transferencia_deposito'
         if 'cheq' in m:
             return 'cheque'
@@ -356,7 +352,7 @@ class InformeDeCajaWizard(models.TransientModel):
             return 'debito'
         if 'tarj' in m and 'cred' in m:
             return 'tarjeta'
-        if 'transf' in m or 'transfer' in m:
+        if 'Transferencia' in m or 'transfer' in m:
             return 'transferencia'
         if 'deposit' in m or 'depos' in m:
             return 'deposito'
