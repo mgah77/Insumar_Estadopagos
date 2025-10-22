@@ -315,38 +315,29 @@ class InformeDeCajaWizard(models.TransientModel):
     # ------------------------------
     def _norm(self, s):
         m = (s or '').strip().lower()
-        # quitar acentos y normalizar
+        # quitar acentos
         return (m.replace('á', 'a').replace('é', 'e').replace('í', 'i')
                   .replace('ó', 'o').replace('ú', 'u').replace('ñ', 'n'))
 
     def _method_to_column(self, method_name):
         """
         Bucket para columnas del informe principal.
-        - 'efectivo' → 'efectivo'
-        - 'debito', 'tarjeta' (credito/debito) → 'debito_tarjeta'
-        - 'transferencia', 'transf', 'transfer', 'transferencia bancaria', 'deposito/depósito' → 'transferencia_deposito'
-        - 'cheque' → 'cheque'
-        Desconocidos → 'transferencia_deposito'
+        - Efectivo
+        - Débito / Tarjeta de crédito  → 'debito_tarjeta'
+        - Transferencia / Depósito     → 'transferencia_deposito'
+        - Cheque
         """
         m = self._norm(method_name)
-        if not m:
-            return 'transferencia_deposito'
-
-        # ordenar de más específico a más genérico
-        if m == 'transferencia' or m.startswith('transferencia') or m.startswith('transf') or 'transfer' in m:
-            return 'transferencia_deposito'
-        if 'deposit' in m or 'depos' in m:
-            return 'transferencia_deposito'
         if 'efect' in m:
             return 'efectivo'
+        # 'deb' o 'tarj' + ('cred' o 'debi') → mezcla de tarjeta crédito/débito
+        if ('deb' in m) or ('tarj' in m and ('cred' in m or 'debi' in m)):
+            return 'debito_tarjeta'
+        if 'transf' in m or 'transfer' in m or 'deposit' in m or 'depos' in m:
+            return 'transferencia_deposito'
         if 'cheq' in m:
             return 'cheque'
-        if 'tarj' in m and ('cred' in m or 'visa' in m or 'master' in m or 'deb' in m):
-            return 'debito_tarjeta'
-        if 'deb' in m:
-            return 'debito_tarjeta'
-
-        # fallback seguro
+        # desconocidos a transferencia/depósito por defecto
         return 'transferencia_deposito'
 
     def _method_to_key(self, method_name):
@@ -355,19 +346,17 @@ class InformeDeCajaWizard(models.TransientModel):
         efectivo, debito, tarjeta, transferencia, deposito, cheque
         """
         m = self._norm(method_name)
-        if not m:
-            return 'transferencia'
-        if m == 'transferencia' or m.startswith('transferencia') or m.startswith('transf') or 'transfer' in m:
+        if 'efect' in m:
+            return 'efectivo'
+        if 'deb' in m:
+            return 'debito'
+        if 'tarj' in m and 'cred' in m:
+            return 'tarjeta'
+        if 'transf' in m or 'transfer' in m:
             return 'transferencia'
         if 'deposit' in m or 'depos' in m:
             return 'deposito'
-        if 'efect' in m:
-            return 'efectivo'
         if 'cheq' in m:
             return 'cheque'
-        if 'tarj' in m and 'cred' in m:
-            return 'tarjeta'
-        if 'deb' in m:
-            return 'debito'
-        # fallback
+        # desconocidos a transferencia
         return 'transferencia'
