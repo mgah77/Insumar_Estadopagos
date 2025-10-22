@@ -314,51 +314,60 @@ class InformeDeCajaWizard(models.TransientModel):
     # Mapeo de métodos de pago (robusto a nombres variados)
     # ------------------------------
     def _norm(self, s):
-        """Normaliza: minúsculas, sin acentos/ñ, sin espacios dobles."""
         m = (s or '').strip().lower()
-        m = (m.replace('á', 'a').replace('é', 'e').replace('í', 'i')
-            .replace('ó', 'o').replace('ú', 'u').replace('ñ', 'n'))
-        m = ' '.join(m.split())
-        return m
+        # quitar acentos y normalizar
+        return (m.replace('á', 'a').replace('é', 'e').replace('í', 'i')
+                  .replace('ó', 'o').replace('ú', 'u').replace('ñ', 'n'))
 
     def _method_to_column(self, method_name):
         """
-        Columnas del informe (agrupadas):
-        - efectivo
-        - debito_tarjeta   (débito y tarjeta de crédito)
-        - transferencia_deposito  (transferencia y depósito)
-        - cheque
+        Bucket para columnas del informe principal.
+        - 'efectivo' → 'efectivo'
+        - 'debito', 'tarjeta' (credito/debito) → 'debito_tarjeta'
+        - 'transferencia', 'transf', 'transfer', 'transferencia bancaria', 'deposito/depósito' → 'transferencia_deposito'
+        - 'cheque' → 'cheque'
+        Desconocidos → 'transferencia_deposito'
         """
         m = self._norm(method_name)
-        # mapeo exacto
-        if m == 'efectivo':
-            return 'efectivo'
-        if m in ('debito', 'débito', 'tarjeta de credito', 'tarjeta de crédito'):
-            return 'debito_tarjeta'
-        if m in ('transferencia', 'deposito', 'depositó', 'depósito'):
+        if not m:
             return 'transferencia_deposito'
-        if m == 'cheque':
+
+        # ordenar de más específico a más genérico
+        if m == 'transferencia' or m.startswith('transferencia') or m.startswith('transf') or 'transfer' in m:
+            return 'transferencia_deposito'
+        if 'deposit' in m or 'depos' in m:
+            return 'transferencia_deposito'
+        if 'efect' in m:
+            return 'efectivo'
+        if 'cheq' in m:
             return 'cheque'
-        # por defecto (si aparece algo inesperado) lo mandamos a transferencia/depósito
+        if 'tarj' in m and ('cred' in m or 'visa' in m or 'master' in m or 'deb' in m):
+            return 'debito_tarjeta'
+        if 'deb' in m:
+            return 'debito_tarjeta'
+
+        # fallback seguro
         return 'transferencia_deposito'
 
     def _method_to_key(self, method_name):
         """
-        Medios individualizados para la tabla lateral:
+        Mapeo fino para la tabla de medios individualizados:
         efectivo, debito, tarjeta, transferencia, deposito, cheque
         """
         m = self._norm(method_name)
-        if m == 'efectivo':
-            return 'efectivo'
-        if m in ('debito', 'débito'):
-            return 'debito'
-        if m in ('tarjeta de credito', 'tarjeta de crédito'):
-            return 'tarjeta'
-        if m == 'transferencia':
+        if not m:
             return 'transferencia'
-        if m in ('deposito', 'depósito', 'depositó'):
+        if m == 'transferencia' or m.startswith('transferencia') or m.startswith('transf') or 'transfer' in m:
+            return 'transferencia'
+        if 'deposit' in m or 'depos' in m:
             return 'deposito'
-        if m == 'cheque':
+        if 'efect' in m:
+            return 'efectivo'
+        if 'cheq' in m:
             return 'cheque'
-        # por defecto
+        if 'tarj' in m and 'cred' in m:
+            return 'tarjeta'
+        if 'deb' in m:
+            return 'debito'
+        # fallback
         return 'transferencia'
