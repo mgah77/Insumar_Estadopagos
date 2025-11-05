@@ -67,7 +67,7 @@ class InformeClientesWizard(models.TransientModel):
         ids_filtrados = []
         for factura in facturas_bruto:
             if (factura.invoice_date and 
-                self.fecha_desde <= factura.invoice_date <= self.fecha_hasta):
+                self.fecha_desde <= factura.invoice_date_due <= self.fecha_hasta):
                 ids_filtrados.append(factura.id)
 
         facturas_filtradas = self.env['account.move'].browse(ids_filtrados)
