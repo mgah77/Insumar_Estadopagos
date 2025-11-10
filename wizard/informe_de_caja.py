@@ -47,8 +47,13 @@ class InformeDeCajaWizard(models.TransientModel):
     def action_print(self):
         self.ensure_one()
         data = self._build_report_data()
-        return self.env.ref('Insumar_Estadopagos.report_caja').report_action(self, data=data)
-
+        
+        # Personalizar el nombre del archivo
+        fecha_str = self.date.strftime('%Y%m%d') if self.date else 'nodate'
+        report = self.env.ref('Insumar_Estadopagos.report_caja')
+        report.name = f'informe_caja_{fecha_str}.pdf'
+        
+        return report.report_action(self, data=data)
     # ------------------------------
     # Core
     # ------------------------------
