@@ -50,10 +50,12 @@
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">Insumar_Estadopagos.informe_de_caja</field>
         <field name="report_file">Insumar_Estadopagos.informe_de_caja</field>
-        <field name="print_report_name">object._get_report_base_filename()</field>
-
-
-
+        <field name="print_report_name">
+            ('Informe_Caja_%s_%s.pdf' % (
+                (object.seleccion_name or 'Todas').replace(' ', '_').replace('ñ', 'n').replace('ú', 'u'),
+                object.date.strftime('%Y-%m-%d') if object.date else 'sin_fecha'
+            ))
+        </field>
     </record>
 
     <!-- Template -->
