@@ -360,3 +360,8 @@ class InformeDeCajaWizard(models.TransientModel):
             return 'cheque'
         # desconocidos a transferencia
         return 'transferencia'
+
+    def _get_report_base_filename(self):
+        self.ensure_one()
+        fecha = (self.date and self.date.strftime('%Y%m%d')) or ''
+        return 'informe_caja_%s' % fecha
