@@ -47,7 +47,7 @@ class InformeDeCajaWizard(models.TransientModel):
     def action_print(self):
         self.ensure_one()
         data = self._build_report_data()
-        return self.env.ref('Insumar_Estadopagos.report_caja').report_action(self, data=data)
+        return self.env.ref('Insumar_Estadopagos.report_caja').with_context(nombre_reporte=('informe_caja_%s' % self.date.strftime('%Y%m%d'))).report_action(self, data=data)
 
     # ------------------------------
     # Core
