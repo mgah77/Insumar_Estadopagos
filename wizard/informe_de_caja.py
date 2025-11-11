@@ -59,7 +59,7 @@ class InformeDeCajaWizard(models.TransientModel):
             )
         return report_string
 
-    # ------------------------------
+    # ------------------------------'Informe de caja.pdf'
     # Core
     # ------------------------------
     def _build_report_data(self):
