@@ -50,12 +50,12 @@ class InformeDeCajaWizard(models.TransientModel):
         return self.env.ref('Insumar_Estadopagos.report_caja').report_action(self, data=data)
 
     def _get_caja_filename(self):
-        self.ensure_one()
+        report_string = ""        
         if self.date:
             string = "Informe de caja"            
             report_string = "{} {}".format(
                 string,
-                self.date.strftime('%d %m %Y'),
+                self.date.strftime('%d%m%Y'),
             )
         return report_string
 
