@@ -50,6 +50,7 @@
         <field name="report_type">qweb-pdf</field>
         <field name="report_name">Insumar_Estadopagos.informe_de_caja</field>
         <field name="report_file">Insumar_Estadopagos.informe_de_caja</field>
+        <field name="print_report_name">'informe_caja_test.pdf'</field>
     </record>
 
     <!-- Template -->
