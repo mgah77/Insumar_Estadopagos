@@ -86,19 +86,22 @@
                 </div>
 
                 <div class="page">
-                    <t t-set="invoice_rows_day" t-value="invoice_rows_day or []"/>
-                    <t t-set="abonos_rows" t-value="abonos_rows or []"/>
-                    <t t-set="refund_rows" t-value="refund_rows or []"/>
+                    <!-- AQUÍ SE LLAMA AL MÉTODO DEL WIZARD -->
+                    <t t-set="data" t-value="docs._build_report_data()"/>
 
-                    <t t-set="inv_day_subtotals" t-value="inv_day_subtotals or {}"/>
-                    <t t-set="abonos_subtotals" t-value="abonos_subtotals or {}"/>
-                    <t t-set="ref_subtotals" t-value="ref_subtotals or {}"/>
-                    <t t-set="grand_totals" t-value="grand_totals or {}"/>
-                    <t t-set="method_totals" t-value="method_totals or {}"/>
-                    <t t-set="credit_total" t-value="credit_total or 0.0"/>
+                    <t t-set="invoice_rows_day" t-value="data.get('invoice_rows_day') or []"/>
+                    <t t-set="abonos_rows" t-value="data.get('abonos_rows') or []"/>
+                    <t t-set="refund_rows" t-value="data.get('refund_rows') or []"/>
 
-                    <t t-set="fecha" t-value="date"/>
-                    <t t-set="seleccion_name" t-value="seleccion_name"/>
+                    <t t-set="inv_day_subtotals" t-value="data.get('inv_day_subtotals') or {}"/>
+                    <t t-set="abonos_subtotals" t-value="data.get('abonos_subtotals') or {}"/>
+                    <t t-set="ref_subtotals" t-value="data.get('ref_subtotals') or {}"/>
+                    <t t-set="grand_totals" t-value="data.get('grand_totals') or {}"/>
+                    <t t-set="method_totals" t-value="data.get('method_totals') or {}"/>
+                    <t t-set="credit_total" t-value="data.get('credit_total') or 0.0"/>
+
+                    <t t-set="date" t-value="data.get('date')"/>
+                    <t t-set="seleccion_name" t-value="data.get('seleccion_name')"/>
 
                     <!-- Tabla principal -->
                     <table class="table table-sm o_main_table" style="width:100%; border-collapse:collapse;" border="1">

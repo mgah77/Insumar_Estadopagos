@@ -46,13 +46,13 @@ class InformeDeCajaWizard(models.TransientModel):
     # ------------------------------
     def action_print(self):
         self.ensure_one()
-        data = self._build_report_data()
 
         filename = self._get_caja_filename()
 
+        # No se pasa data, solo docids + contexto para el nombre del archivo
         return self.env.ref('Insumar_Estadopagos.report_caja') \
             .with_context(forced_filename=filename) \
-            .report_action(self, data=data, config=False)
+            .report_action(self, config=False)
 
     def _get_caja_filename(self):
         self.ensure_one()
