@@ -48,12 +48,11 @@ class InformeDeCajaWizard(models.TransientModel):
         self.ensure_one()
         data = self._build_report_data()
 
-        return self.env.ref('Insumar_Estadopagos.report_caja').report_action(
-            self,
-            data=data,
-            config=False,
-            context={'forced_filename': self._get_caja_filename()}
-        )
+        filename = self._get_caja_filename()
+
+        return self.env.ref('Insumar_Estadopagos.report_caja') \
+            .with_context(forced_filename=filename) \
+            .report_action(self, data=data, config=False)
 
     def _get_caja_filename(self):
         self.ensure_one()
