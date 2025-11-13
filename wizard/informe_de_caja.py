@@ -47,8 +47,8 @@ class InformeDeCajaWizard(models.TransientModel):
     def action_print(self):
         self.ensure_one()
         data = self._build_report_data()
-        return self.env.ref('Insumar_Estadopagos.report_caja').report_action(self, data=data)
-
+        return self.env.ref('Insumar_Estadopagos.report_caja').report_action(self, data=data, config=False)
+        
     def _get_caja_filename(self):
         self.ensure_one()
         report_string = ""  
