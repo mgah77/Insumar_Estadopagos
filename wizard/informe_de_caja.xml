@@ -75,7 +75,11 @@
                     .summary-table td.col-money { text-align: right; width: 140px; }
                     .summary-table tfoot td { font-weight: bold; }
                 </style>
-
+                 <!-- AQUÍ SE LLAMA AL MÉTODO DEL WIZARD -->   
+                <t t-set="data" t-value="docs._build_report_data()"/>
+                <t t-set="date" t-value="data.get('date')"/>
+                <t t-set="seleccion_name" t-value="data.get('seleccion_name')"/>
+                
                 <div class="header">
                     <div style="text-align:center; font-weight:700; font-size:17px;">
                         Informe de caja
@@ -86,8 +90,7 @@
                 </div>
 
                 <div class="page">
-                    <!-- AQUÍ SE LLAMA AL MÉTODO DEL WIZARD -->
-                    <t t-set="data" t-value="docs._build_report_data()"/>
+                                    
 
                     <t t-set="invoice_rows_day" t-value="data.get('invoice_rows_day') or []"/>
                     <t t-set="abonos_rows" t-value="data.get('abonos_rows') or []"/>
