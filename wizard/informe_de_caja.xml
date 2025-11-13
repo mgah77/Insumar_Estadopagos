@@ -79,13 +79,13 @@
                 <t t-set="data" t-value="docs._build_report_data()"/>
                 <t t-set="date" t-value="data.get('date')"/>
                 <t t-set="seleccion_name" t-value="data.get('seleccion_name')"/>
-                
+
                 <div class="header">
                     <div style="text-align:center; font-weight:700; font-size:17px;">
                         Informe de caja
                     </div>
                     <div style="text-align:center; font-size:14px; margin-top:2px;">
-                        Caja: <t t-esc="seleccion_name"/> — Fecha: <t t-esc="date"/>
+                        Caja: <t t-esc="seleccion_name"/> — Fecha: <t t-esc="date.strftime('%d-%m-%Y')" />
                     </div>
                 </div>
 
