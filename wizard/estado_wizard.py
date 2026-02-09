@@ -52,7 +52,7 @@ class EstadoWizard(models.TransientModel):
         return report.with_context(active_ids=self.ids, active_model=self._name).report_action(self)
 
 
-    detalles_facturas_out = fields.Text(string="Detalles de Facturas Vencidas", compute="_compute_detalles_facturas_out")
+    detalles_facturas_out = fields.Text(string="Detalle de Facturas Vencidas", compute="_compute_detalles_facturas_out")
 
     @api.depends('facturas_out')
     def _compute_detalles_facturas_out(self):
