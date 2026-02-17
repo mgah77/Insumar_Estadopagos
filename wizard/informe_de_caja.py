@@ -370,3 +370,80 @@ class InformeDeCajaWizard(models.TransientModel):
             return 'cheque'
         # desconocidos a transferencia
         return 'transferencia'
+
+
+class AccountPaymentRegister(models.TransientModel):
+    _inherit = 'account.payment.register'
+
+    # Campo técnico para controlar la edición en la vista
+    is_journal_readonly = fields.Boolean(
+        string='Diario Restringido', 
+        compute='_compute_is_journal_readonly'
+    )
+
+    @api.depends('journal_id')
+    def _compute_is_journal_readonly(self):
+        """
+        Determina si el diario debe ser de solo lectura.
+        Es solo lectura si el usuario pertenece a un equipo de ventas específico.
+        """
+        # Equipos definidos en tu informe original
+        team_par = self.env['crm.team'].browse(1)
+        team_nub = self.env['crm.team'].browse(5)
+        user = self.env.user
+
+        # Verificar pertenencia a equipos
+        is_par = bool(team_par) and (user in team_par.member_ids)
+        # CORRECCIÓN: Usar team_nub (antes tenía un error de tipeo)
+        is_nub = bool(team_nub) and (user in team_nub.member_ids)
+
+        for rec in self:
+            # Si es usuario de sucursal, bloqueamos el campo.
+            rec.is_journal_readonly = (is_par or is_nub)
+
+    @api.model
+    def default_get(self, default_fields):
+        """
+        Sobrescribimos default_get para forzar el diario al abrir el wizard.
+        Este es el método correcto para wizards transient.
+        """
+        # 1. Ejecutamos la lógica estándar de Odoo primero
+        res = super(AccountPaymentRegister, self).default_get(default_fields)
+        
+        # 2. Forzamos el diario si corresponde
+        user = self.env.user
+        team_par = self.env['crm.team'].browse(1)
+        team_nub = self.env['crm.team'].browse(5)
+        
+        is_par = bool(team_par) and (user in team_par.member_ids)
+        is_nub = bool(team_nub) and (user in team_nub.member_ids)
+        
+        if is_par:
+            res['journal_id'] = 12
+        elif is_nub:
+            res['journal_id'] = 14
+            
+        return res
+
+    def action_create_payments(self):
+        """
+        Validación final antes de crear el pago.
+        Evita que alguien con 'readonly' pueda cambiar el diario mediante herramientas de desarrollo.
+        """
+        for rec in self:
+            if rec.is_journal_readonly:
+                user = self.env.user
+                team_par = self.env['crm.team'].browse(1)
+                team_nub = self.env['crm.team'].browse(5)
+                
+                correct_journal_id = False
+                if user in team_par.member_ids:
+                    correct_journal_id = 12
+                elif user in team_nub.member_ids:
+                    correct_journal_id = 14
+                
+                # Si el diario actual es distinto al que debería ser, lanzamos error
+                if correct_journal_id and rec.journal_id.id != correct_journal_id:
+                    raise UserError(_("No tiene permisos para utilizar este diario de pago. Utilice el diario asignado para su sucursal."))
+                    
+        return super(AccountPaymentRegister, self).action_create_payments()
